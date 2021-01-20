@@ -1,8 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:imumonitor/widget/linechart.dart';
-import 'package:imumonitor/widget/owaslevel.dart';
-import 'package:imumonitor/temp/data.dart';
-import 'package:imumonitor/config/colorscheme.dart';
+import '../widget/linechart.dart';
+import '../widget/owaslevel.dart';
+import '../widget/imucontainer.dart';
+import '../config/colorscheme.dart';
+import '../temp/data.dart';
 
 class OwasTab extends StatefulWidget {
   @override
@@ -10,10 +12,16 @@ class OwasTab extends StatefulWidget {
 }
 
 class _OwasTabState extends State<OwasTab> {
+  User user;
+  List<MultiSeriesData> imuData;
+
   @override
   Widget build(BuildContext context) {
+    final inheritContainer = ImuContainer.of(context);
+    user = inheritContainer.user;
+    imuData = inheritContainer.imuDataBase;
+
     return Container(
-      color: kBackgroundColor,
       child: Center(
         child: Column(
           // center the children
@@ -28,7 +36,7 @@ class _OwasTabState extends State<OwasTab> {
             ),
             LineChart(
               "",
-              owasData,
+              imuData[0],
             ),
             SizedBox(
               height: 30,
@@ -62,6 +70,46 @@ class _OwasTabState extends State<OwasTab> {
                 ],
               ),
             ),
+            SizedBox(
+              height: 55,
+            ),
+            /*
+            SizedBox(
+              height: 55,
+              child: RaisedButton(
+                onPressed: () {
+                  /*
+                  DateTime _now = DateTime.now();
+
+                  inheritContainer.updateSeriesData(
+                    1,
+                    _now.hour.toString() +
+                        ":" +
+                        _now.minute.toString() +
+                        ":" +
+                        _now.second.toString(),
+                    <double>[
+                      Random().nextInt(360).toDouble(),
+                      Random().nextInt(360).toDouble(),
+                      Random().nextInt(360).toDouble(),
+                      Random().nextInt(360).toDouble(),
+                    ],
+                  );
+
+                  setState(() {});
+                  */
+                },
+                color: kButtonColor,
+                padding: const EdgeInsets.all(18.0),
+                child: Text(
+                  "Submit",
+                  style: TextStyle(
+                    color: kTitleColor,
+                  ),
+                ),
+              ),
+            ),
+            */
           ],
         ),
       ),

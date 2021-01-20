@@ -1,13 +1,16 @@
 name: imumonitor
 description: A new Flutter project.
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+  
 dependencies:
   flutter:
-    sdk: flutter   
-
+    sdk: flutter
+    
+  flutter_blue: 0.7.2 
   intl: ^0.16.1
   syncfusion_flutter_charts: ^18.4.31
-  
 
 dev_dependencies:
   flutter_test:
@@ -19,6 +22,22 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+        - asset: assets/fonts/Roboto-Black.ttf
+        - asset: assets/fonts/Roboto-BlackItalic.ttf
+        - asset: assets/fonts/Roboto-BoldItalic.ttf
+        - asset: assets/fonts/Roboto-Italic.ttf
+        - asset: assets/fonts/Roboto-Light.ttf
+        - asset: assets/fonts/Roboto-LightItalic.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
+        - asset: assets/fonts/Roboto-MediumItalic.ttf
+        - asset: assets/fonts/Roboto-Thin.ttf
+        - asset: assets/fonts/Roboto-ThinItalic.ttf
+          weight: 700
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -43,6 +62,7 @@ flutter:
   #
   assets:
    - assets/img/logo.png
+   - assets/img/save.png
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

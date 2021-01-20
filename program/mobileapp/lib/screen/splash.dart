@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:imumonitor/screen/home.dart';
-import 'package:imumonitor/config/colorscheme.dart';
+import '../screen/registration.dart';
+import '../config/colorscheme.dart';
 
 class SplashScreen extends StatefulWidget {
   static const String id = "splash_screen";
@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   removeScreen() {
     return _timer = Timer(Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacementNamed(HomeScreen.id);
+      Navigator.of(context).pushReplacementNamed(RegistrationScreen.id);
     });
   }
 

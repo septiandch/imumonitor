@@ -24,7 +24,7 @@ class MultiSeriesData {
 
 class LineChart extends StatefulWidget {
   final String title;
-  MultiSeriesData chartData;
+  final MultiSeriesData chartData;
 
   LineChart(
     this.title,
@@ -48,7 +48,7 @@ class _LineChartState extends State<LineChart> {
             Text(
               widget.title,
               style: TextStyle(
-                color: Colors.black,
+                color: kTextColor,
                 fontSize: 25.0,
                 fontWeight: FontWeight.bold,
               ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:imumonitor/widget/linechart.dart';
-import 'package:imumonitor/temp/data.dart';
-import 'package:imumonitor/config/colorscheme.dart';
+import '../widget/linechart.dart';
+import '../widget/imucontainer.dart';
+import '../temp/data.dart';
 
 class SensorTab extends StatefulWidget {
   @override
@@ -10,6 +10,8 @@ class SensorTab extends StatefulWidget {
 }
 
 class _SensorTabState extends State<SensorTab> {
+  User user;
+  List<MultiSeriesData> imuData;
   String stime = DateFormat('kk:mm').format(DateTime.now()).toString();
 
   @override
@@ -24,9 +26,12 @@ class _SensorTabState extends State<SensorTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBackgroundColor,
-      body: SingleChildScrollView(
+    final inheritContainer = ImuContainer.of(context);
+    user = inheritContainer.user;
+    imuData = inheritContainer.imuDataBase;
+
+    return Container(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: Container(
           child: Center(
@@ -38,31 +43,31 @@ class _SensorTabState extends State<SensorTab> {
                 ),
                 LineChart(
                   "Lower Back",
-                  sensorData_1,
+                  imuData[1],
                 ),
                 LineChart(
-                  "Upper Hand Right",
-                  sensorData_2,
+                  "Upper Right Hand",
+                  imuData[2],
                 ),
                 LineChart(
-                  "Upper Hand Left",
-                  sensorData_3,
+                  "Upper Left Hand",
+                  imuData[3],
                 ),
                 LineChart(
-                  "Lower Hand Right",
-                  sensorData_4,
+                  "Lower Right Hand",
+                  imuData[4],
                 ),
                 LineChart(
-                  "Lower Hand Left",
-                  sensorData_5,
+                  "Lower Left Hand",
+                  imuData[5],
                 ),
                 LineChart(
-                  "Leg Right",
-                  sensorData_6,
+                  "Right Leg",
+                  imuData[6],
                 ),
                 LineChart(
-                  "Leg Left",
-                  sensorData_7,
+                  "Left Leg",
+                  imuData[7],
                 ),
               ],
             ),
