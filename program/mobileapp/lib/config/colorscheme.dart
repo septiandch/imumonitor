@@ -12,3 +12,9 @@ const List<Color> kSeriesColors = [
   Color(0xFFEA686D),
   Color(0xFF4BC076)
 ];
+const List<Color> kSeriesColors2 = [
+  Color(0x047D8EE1),
+  Color(0x04FDB858),
+  Color(0x04EA686D),
+  Color(0x044BC076)
+];

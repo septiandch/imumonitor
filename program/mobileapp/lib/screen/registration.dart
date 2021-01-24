@@ -21,7 +21,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       switch (label) {
         case 'Nama':
           {
-            _user.name = text;
+            (text == "") ? _user.name = "" : _user.name = text;
           }
           break;
         case 'Umur':
@@ -118,7 +118,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             _user.height == 0 ||
                             _user.weight == null ||
                             _user.weight == 0) {
-                          _showSnackBar("Mohon lengkapi form...");
+                          //_showSnackBar("Mohon lengkapi form...");
+
+                          ImuContainer.of(context).updateUser(User(
+                              name: "Test", age: 28, height: 180, weight: 78));
+
+                          Navigator.of(context)
+                              .pushReplacementNamed(HomeScreen.id);
                         } else {
                           ImuContainer.of(context).updateUser(_user);
 

@@ -65,24 +65,25 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  void _deviceListen(List<int> value) {
+  void _deviceListen(List<int> rawValue) {
     _now = DateTime.now();
-    print(intToString(value));
+    List<String> value = intToString(rawValue).split(',');
+    print(value);
 
     //if (_listenStart) {
     setState(() {
       ImuContainer.of(context).updateSeriesData(
-        value[0] - 48,
+        int.parse(value[0]),
         _now.hour.toString() +
             ":" +
             _now.minute.toString() +
             ":" +
             _now.second.toString(),
         <double>[
-          value[2].toDouble() - 48,
-          value[4].toDouble() - 48,
-          value[6].toDouble() - 48,
-          if (value[0] == 1) value[8].toDouble() - 48,
+          double.parse(value[1]),
+          double.parse(value[2]),
+          double.parse(value[3]),
+          if (value[0] == '1') double.parse(value[4]),
         ],
       );
     });

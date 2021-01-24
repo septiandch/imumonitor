@@ -1,10 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import '../widget/linechart.dart';
 import '../widget/owaslevel.dart';
 import '../widget/imucontainer.dart';
 import '../config/colorscheme.dart';
-import '../temp/data.dart';
 
 class OwasTab extends StatefulWidget {
   @override
@@ -34,9 +32,22 @@ class _OwasTabState extends State<OwasTab> {
             SizedBox(
               height: 20,
             ),
-            LineChart(
-              "",
-              imuData[0],
+            Container(
+              width: MediaQuery.of(context).size.width * 0.75,
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                    offset: Offset(0, 5), // changes position of shadow
+                  )
+                ],
+              ),
+              child: lineChart("", imuData[0]),
             ),
             SizedBox(
               height: 30,
