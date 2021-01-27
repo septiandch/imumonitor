@@ -18,3 +18,10 @@ const List<Color> kSeriesColors2 = [
   Color(0x04EA686D),
   Color(0x044BC076)
 ];
+const List<Color> kOwasColors = [
+  Color(0xFF4BC076),
+  Color(0xFF4BC076),
+  Color(0xFF188CF6),
+  Color(0xFFFDB858),
+  Color(0xFFF84F4F),
+];

@@ -12,7 +12,7 @@ class SavedScreen extends StatefulWidget {
 class _SavedScreenState extends State<SavedScreen> {
   Timer _timer;
 
-  removeScreen() {
+  _removeScreen() {
     return _timer = Timer(Duration(seconds: 2), () {
       Navigator.pop(context);
     });
@@ -21,7 +21,7 @@ class _SavedScreenState extends State<SavedScreen> {
   @override
   void initState() {
     super.initState();
-    removeScreen();
+    _removeScreen();
   }
 
   @override

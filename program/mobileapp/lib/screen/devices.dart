@@ -37,9 +37,9 @@ void deviceListen(
   }
 }
 
-void deviceWrite(BluetoothCharacteristic characteristic, String text) {
+deviceWrite(BluetoothCharacteristic characteristic, String text) async {
   if (characteristic.properties.write) {
-    characteristic.write(utf8.encode(text));
+    await characteristic.write(utf8.encode(text));
   }
 }
 
@@ -77,7 +77,7 @@ class DeviceScreen extends StatefulWidget {
 
 class _DeviceScreenState extends State<DeviceScreen> {
   List<DeviceSelection> _deviceList = new List();
-  DeviceSelection _selectedDevice;
+  DeviceSelection _selectedDevice = DeviceSelection();
   bool _isDeviceSelected = false;
 
   _addDeviceTolist(final BluetoothDevice device) {
@@ -188,8 +188,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   void _connectToDevice() async {
-    widget.flutterBlue.stopScan();
-
     if (_selectedDevice.device != null) {
       try {
         await _selectedDevice.device.connect();
@@ -201,6 +199,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
         _selectedDevice.services =
             await _selectedDevice.device.discoverServices();
       }
+    }
+
+    if (widget.flutterBlue.isScanning.isBroadcast) {
+      widget.flutterBlue.stopScan();
     }
 
     Navigator.pop(context, _selectedDevice);

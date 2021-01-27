@@ -2,64 +2,64 @@ import 'package:imumonitor/widget/linechart.dart';
 
 MultiSeriesData owasData = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Back", owasData_back),
-    SeriesData("Arms", owasData_arms),
-    SeriesData("Legs", owasData_legs),
-    SeriesData("Load", owasData_load)
+    SeriesData("Back", owasDataBack),
+    SeriesData("Arms", owasDataArms),
+    SeriesData("Legs", owasDataLegs),
+    SeriesData("Load", owasDataLoad)
   ],
 );
 
 MultiSeriesData sensorData_1 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_back),
-    SeriesData("Pitch", owasData_arms),
-    SeriesData("Yaw", owasData_load),
+    SeriesData("Roll", owasDataBack),
+    SeriesData("Pitch", owasDataArms),
+    SeriesData("Yaw", owasDataLoad),
   ],
 );
 MultiSeriesData sensorData_2 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_legs),
-    SeriesData("Pitch", owasData_load),
-    SeriesData("Yaw", owasData_back),
+    SeriesData("Roll", owasDataLegs),
+    SeriesData("Pitch", owasDataLoad),
+    SeriesData("Yaw", owasDataBack),
   ],
 );
 MultiSeriesData sensorData_3 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_load),
-    SeriesData("Pitch", owasData_arms),
-    SeriesData("Yaw", owasData_legs),
+    SeriesData("Roll", owasDataLoad),
+    SeriesData("Pitch", owasDataArms),
+    SeriesData("Yaw", owasDataLegs),
   ],
 );
 MultiSeriesData sensorData_4 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_arms),
-    SeriesData("Pitch", owasData_load),
-    SeriesData("Yaw", owasData_back),
+    SeriesData("Roll", owasDataArms),
+    SeriesData("Pitch", owasDataLoad),
+    SeriesData("Yaw", owasDataBack),
   ],
 );
 MultiSeriesData sensorData_5 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_legs),
-    SeriesData("Pitch", owasData_load),
-    SeriesData("Yaw", owasData_back),
+    SeriesData("Roll", owasDataLegs),
+    SeriesData("Pitch", owasDataLoad),
+    SeriesData("Yaw", owasDataBack),
   ],
 );
 MultiSeriesData sensorData_6 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_arms),
-    SeriesData("Pitch", owasData_back),
-    SeriesData("Yaw", owasData_legs),
+    SeriesData("Roll", owasDataArms),
+    SeriesData("Pitch", owasDataBack),
+    SeriesData("Yaw", owasDataLegs),
   ],
 );
 MultiSeriesData sensorData_7 = MultiSeriesData(
   <SeriesData>[
-    SeriesData("Roll", owasData_back),
-    SeriesData("Pitch", owasData_legs),
-    SeriesData("Yaw", owasData_arms),
+    SeriesData("Roll", owasDataBack),
+    SeriesData("Pitch", owasDataLegs),
+    SeriesData("Yaw", owasDataArms),
   ],
 );
 
-List<SingleData> owasData_back = [
+List<SingleData> owasDataBack = [
   SingleData("07:00", 10),
   SingleData("07:05", 90),
   SingleData("07:10", 90),
@@ -72,7 +72,7 @@ List<SingleData> owasData_back = [
   SingleData("07:45", 10),
   SingleData("07:50", 20)
 ];
-List<SingleData> owasData_arms = [
+List<SingleData> owasDataArms = [
   SingleData("07:00", 20),
   SingleData("07:05", 60),
   SingleData("07:10", 30),
@@ -85,7 +85,7 @@ List<SingleData> owasData_arms = [
   SingleData("07:45", 20),
   SingleData("07:50", 40)
 ];
-List<SingleData> owasData_legs = [
+List<SingleData> owasDataLegs = [
   SingleData("07:00", 90),
   SingleData("07:05", 10),
   SingleData("07:10", 20),
@@ -98,7 +98,7 @@ List<SingleData> owasData_legs = [
   SingleData("07:45", 180),
   SingleData("07:50", 120)
 ];
-List<SingleData> owasData_load = [
+List<SingleData> owasDataLoad = [
   SingleData("07:00", 10),
   SingleData("07:05", 70),
   SingleData("07:10", 45),
@@ -111,7 +111,7 @@ List<SingleData> owasData_load = [
   SingleData("07:45", 70),
   SingleData("07:50", 40)
 ];
-List<SingleData> sensorData_roll = [
+List<SingleData> sensorDataRoll = [
   SingleData("07:00", 0),
   SingleData("07:05", 90),
   SingleData("07:10", 90),
@@ -124,7 +124,7 @@ List<SingleData> sensorData_roll = [
   SingleData("07:45", 10),
   SingleData("07:50", 20)
 ];
-List<SingleData> sensorData_pitch = [
+List<SingleData> sensorDataPitch = [
   SingleData("07:00", 10),
   SingleData("07:05", 90),
   SingleData("07:10", 90),
@@ -138,7 +138,7 @@ List<SingleData> sensorData_pitch = [
   SingleData("07:50", 20)
 ];
 
-List<SingleData> sensorData_yaw = [
+List<SingleData> sensorDataYaw = [
   SingleData("07:00", 10),
   SingleData("07:05", 90),
   SingleData("07:10", 90),

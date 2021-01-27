@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../tabs/setting.dart';
 import '../widget/linechart.dart';
 
 const List<String> owasTitle = ["Back", "Arms", "Legs", "Load"];
@@ -17,11 +19,15 @@ class ImuContainer extends StatefulWidget {
   final Widget child;
   final User user;
   final List<MultiSeriesData> imuDataBase;
+  final List<int> owasDataBase;
+  final List<int> settingValue;
 
   ImuContainer({
     @required this.child,
     this.user,
     this.imuDataBase,
+    this.owasDataBase,
+    this.settingValue,
   });
 
   static _ImuContainerState of(BuildContext context) {
@@ -36,6 +42,9 @@ class ImuContainer extends StatefulWidget {
 
 class _ImuContainerState extends State<ImuContainer> {
   User user;
+  List<int> owasDataBase = List<int>();
+  List<int> settingValue = List<int>.generate(settingList.length,
+      (index) => (index == settingList.length - 1) ? 10 : 180);
 
   List<MultiSeriesData> imuDataBase = List<MultiSeriesData>.generate(
     8,
@@ -59,22 +68,88 @@ class _ImuContainerState extends State<ImuContainer> {
 
   @override
   void initState() {
+    owasDataBase.add(0);
+
     super.initState();
   }
 
-  void updateUser(User _user) {
+  updateUserData(User _user) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'user_data';
+
     setState(() {
       user = _user;
+      prefs.setString(
+        key,
+        user.name +
+            ',' +
+            user.age.toString() +
+            ',' +
+            user.height.toString() +
+            ',' +
+            user.weight.toString(),
+      );
     });
   }
 
-  void updateSeriesData(int index, String time, List<double> value) {
+  getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'user_data';
+
+    String value = prefs.getString(key) ?? '';
+
+    if (value != '') {
+      List<String> values = value.split(',');
+
+      user = User(
+        name: values[0],
+        age: int.parse(values[1]),
+        height: int.parse(values[2]),
+        weight: int.parse(values[3]),
+      );
+    } else {
+      user = User(
+        name: '',
+        age: 0,
+        weight: 0,
+        height: 0,
+      );
+    }
+  }
+
+  getSettingValue() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'current_setting';
+    String value = prefs.getString(key) ?? '';
+
+    //print('read: $value');
+
+    if (value != '') {
+      List<String> values =
+          value.replaceAll('[', '').replaceAll(']', '').split(',');
+
+      settingValue = List<int>.generate(
+          values.length, (index) => int.parse(values[index]));
+    }
+  }
+
+  updateSettingValue(String text) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'current_setting';
+    prefs.setString(key, text);
+
+    print('saved $text');
+  }
+
+  void updateSeriesData(int index, String time, List<int> value) {
     setState(() {
       for (var i = 0; i < value.length; i++) {
-        imuDataBase[index - 1]
-            .multiSeriesData[i]
-            .seriesData
-            .add(SingleData(time, value[i]));
+        (i == 4)
+            ? owasDataBase.add(value[i])
+            : imuDataBase[index - 1]
+                .multiSeriesData[i]
+                .seriesData
+                .add(SingleData(time, value[i].toDouble()));
       }
     });
   }

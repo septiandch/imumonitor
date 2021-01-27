@@ -14,6 +14,12 @@ const List<String> sensorList = [
   "Left Leg",
 ];
 
+MultiSeriesData dummyData = MultiSeriesData(<SeriesData>[
+  SeriesData('Roll', <SingleData>[SingleData('', 0)]),
+  SeriesData('Pitch', <SingleData>[SingleData('', 0)]),
+  SeriesData('Yaw', <SingleData>[SingleData('', 0)]),
+]);
+
 class SensorTab extends StatefulWidget {
   @override
   _SensorTabState createState() => _SensorTabState();
@@ -34,26 +40,9 @@ class _SensorTabState extends State<SensorTab> {
     super.dispose();
   }
 
-  void _settingModalBottomSheet(
-      context, String title, MultiSeriesData chartData) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return Container(
-            width: MediaQuery.of(context).size.width * 0.75,
-            padding: EdgeInsets.all(20),
-            child: lineChart(
-              title,
-              chartData,
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final inheritContainer = ImuContainer.of(context);
-    imuData = inheritContainer.imuDataBase;
+    imuData = ImuContainer.of(context).imuDataBase;
 
     return Container(
       child: SingleChildScrollView(
@@ -67,10 +56,15 @@ class _SensorTabState extends State<SensorTab> {
                   height: 20,
                 ),
                 for (int i = 0; i < sensorList.length; i++)
-                  Monitor(
-                    sensorList[i],
-                    imuData[i + 1],
-                  ),
+                  (imuData[i + 1].multiSeriesData[0].seriesData.isNotEmpty)
+                      ? Monitor(
+                          sensorList[i],
+                          imuData[i + 1],
+                        )
+                      : Monitor(
+                          sensorList[i],
+                          dummyData,
+                        )
               ],
             ),
           ),

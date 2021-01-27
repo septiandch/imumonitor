@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../screen/home.dart';
 import '../widget/textbox.dart';
 import '../widget/imucontainer.dart';
 import '../config/colorscheme.dart';
@@ -12,16 +11,22 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  User _user = User();
+  User _user;
+
+  @override
+  void initState() {
+    _user = User(name: '', age: 0, weight: 0, height: 0);
+    super.initState();
+  }
 
   void submit(String label, String text) {
-    print(label + " : " + text);
+    // print(label + " : " + text);
 
     setState(() {
       switch (label) {
         case 'Nama':
           {
-            (text == "") ? _user.name = "" : _user.name = text;
+            _user.name = text;
           }
           break;
         case 'Umur':
@@ -110,26 +115,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: RaisedButton(
                       onPressed: () {
-                        if (_user.name == null ||
-                            _user.name == "" ||
-                            _user.age == null ||
+                        if (_user.name.isEmpty ||
                             _user.age == 0 ||
-                            _user.height == null ||
                             _user.height == 0 ||
-                            _user.weight == null ||
                             _user.weight == 0) {
-                          //_showSnackBar("Mohon lengkapi form...");
-
-                          ImuContainer.of(context).updateUser(User(
-                              name: "Test", age: 28, height: 180, weight: 78));
-
-                          Navigator.of(context)
-                              .pushReplacementNamed(HomeScreen.id);
+                          _showSnackBar("Mohon lengkapi form...");
                         } else {
-                          ImuContainer.of(context).updateUser(_user);
-
-                          Navigator.of(context)
-                              .pushReplacementNamed(HomeScreen.id);
+                          ImuContainer.of(context).updateUserData(_user);
+                          Navigator.pop(context);
                         }
                       },
                       color: kButtonColor,

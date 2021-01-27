@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
+import '../widget/imucontainer.dart';
 import '../screen/saved.dart';
-import '../widget/textbox.dart';
+import '../screen/registration.dart';
 import '../config/colorscheme.dart';
 
+const List<String> settingList = [
+  "Back",
+  "Upper Arms",
+  "Lower Arms",
+  "Upper Legs",
+  "Lower Legs",
+  "Update Interval",
+];
+
 class SettingTab extends StatefulWidget {
-  @override
+  final VoidCallback callBackFunc;
+
+  SettingTab(this.callBackFunc);
+
   _SettingTabState createState() => _SettingTabState();
 }
 
 class _SettingTabState extends State<SettingTab> {
-  final int oneInput = 1;
-  final int twoInput = 2;
+  List<int> _currentValue = List<int>();
 
-  void submit(String label, String text) {
-    switch (label) {
-      case "Min":
-        break;
-      case "Max":
-        break;
-      case "Minutes":
-        break;
-      default:
-        print("Invalid submission : " + label);
-        break;
-    }
+  @override
+  void initState() {
+    super.initState();
   }
 
-  Widget inputField(String inputTitle, int fieldCount) {
+  Widget _valuePicker(String title, int min, int max) {
     return Column(
       children: <Widget>[
         Row(
@@ -37,7 +41,7 @@ class _SettingTabState extends State<SettingTab> {
               width: 160,
               height: 50,
               child: Text(
-                inputTitle,
+                title,
                 style: TextStyle(
                   color: kTextColor,
                   fontWeight: FontWeight.bold,
@@ -45,23 +49,33 @@ class _SettingTabState extends State<SettingTab> {
                 ),
               ),
             ),
-            if (fieldCount == 2) ...[
-              Container(
-                width: 60,
-                height: 50,
-                child: TextBox("Min", "", numberInput, submit),
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.all(
+                  const Radius.circular(5),
+                ),
               ),
-              Container(
-                width: 60,
-                height: 50,
-                child: TextBox("Max", "", numberInput, submit),
+              child: NumberPicker.horizontal(
+                initialValue: _currentValue[settingList.indexOf(title)],
+                minValue: min,
+                maxValue: max,
+                step: 1,
+                zeroPad: false,
+                selectedTextStyle: TextStyle(
+                  color: kTextColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                ),
+                textStyle: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 12.0,
+                ),
+                onChanged: (value) => setState(
+                    () => _currentValue[settingList.indexOf(title)] = value),
               ),
-            ] else
-              Container(
-                width: 145,
-                height: 50,
-                child: TextBox("Minutes", "", numberInput, submit),
-              ),
+            ),
           ],
         ),
         SizedBox(
@@ -71,7 +85,7 @@ class _SettingTabState extends State<SettingTab> {
     );
   }
 
-  Widget button(String title, IconData icon, VoidCallback func) {
+  Widget _button(String title, IconData icon, VoidCallback func) {
     return SizedBox(
       height: 60,
       width: MediaQuery.of(context).size.width * 0.8,
@@ -106,16 +120,39 @@ class _SettingTabState extends State<SettingTab> {
     );
   }
 
-  void test1() {
-    print("GANTI USER");
+  List<int> _loadSetting() {
+    List<int> values = ImuContainer.of(context).settingValue;
+
+    if (_currentValue.isEmpty) {
+      if (values.isNotEmpty)
+        setState(() {
+          _currentValue = values;
+        });
+      else
+        setState(() {
+          _currentValue = List<int>.generate(settingList.length,
+              (index) => (index == settingList.length - 1) ? 10 : 180);
+        });
+    }
   }
 
-  void toSavedScreen() {
-    Navigator.of(context).pushNamed(SavedScreen.id);
+  void _toSavedScreen() async {
+    ImuContainer.of(context).updateSettingValue(_currentValue.toString());
+    await Navigator.of(context).pushNamed(SavedScreen.id);
+
+    widget.callBackFunc();
+  }
+
+  void _toRegistrationScreen() async {
+    await Navigator.of(context).pushNamed(RegistrationScreen.id);
+
+    widget.callBackFunc();
   }
 
   @override
   Widget build(BuildContext context) {
+    _loadSetting();
+
     return SingleChildScrollView(
       child: Center(
         child: Container(
@@ -127,20 +164,19 @@ class _SettingTabState extends State<SettingTab> {
               SizedBox(
                 height: 30,
               ),
-              inputField("Back", twoInput),
-              inputField("Upper Arms", twoInput),
-              inputField("Lower Arms", twoInput),
-              inputField("Right Legs", twoInput),
-              inputField("Left Legs", twoInput),
-              inputField("Update Interval", oneInput),
-              SizedBox(
-                height: 15,
-              ),
-              button("Simpan", Icons.save, toSavedScreen),
+              if (_currentValue.isNotEmpty)
+                for (String element in settingList)
+                  (settingList.indexOf(element) != settingList.length - 1)
+                      ? _valuePicker(element, 0, 360)
+                      : _valuePicker(element, 1, 60),
               SizedBox(
                 height: 20,
               ),
-              button("Ganti User", Icons.person, test1),
+              _button("Simpan", Icons.save, _toSavedScreen),
+              SizedBox(
+                height: 20,
+              ),
+              _button("Ganti User", Icons.person, _toRegistrationScreen),
             ],
           ),
         ),

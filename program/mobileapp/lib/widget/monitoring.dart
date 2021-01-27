@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widget/imucontainer.dart';
 import '../widget/linechart.dart';
 import 'package:imumonitor/config/colorscheme.dart';
 
@@ -80,8 +79,17 @@ class _MonitorState extends State<Monitor> {
   void _settingModalBottomSheet(context, String title, MultiSeriesData value) {
     showModalBottomSheet(
         context: context,
-        builder: (BuildContext bc) {
+        backgroundColor: Colors.transparent,
+        builder: (context) {
           return Container(
+            height: 380,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+              ),
+            ),
             width: MediaQuery.of(context).size.width * 0.75,
             padding: EdgeInsets.all(20),
             child: lineChart(
@@ -94,9 +102,6 @@ class _MonitorState extends State<Monitor> {
 
   @override
   Widget build(BuildContext context) {
-    final inheritContainer = ImuContainer.of(context);
-    List<MultiSeriesData> imuData = inheritContainer.imuDataBase;
-
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       margin: EdgeInsets.only(bottom: 20.0),
