@@ -16,7 +16,7 @@ class _OwasTabState extends State<OwasTab> {
   Widget _owasLevel(int value) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(5)),
         color: kOwasColors[value],
       ),
       width: MediaQuery.of(context).size.width * 0.75,
@@ -29,7 +29,7 @@ class _OwasTabState extends State<OwasTab> {
             "OWAS\nCategory",
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: kTitleColor,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 16.0,
             ),
@@ -39,7 +39,7 @@ class _OwasTabState extends State<OwasTab> {
             height: 45,
             width: 3,
             decoration: BoxDecoration(
-              color: kTitleColor,
+              color: Colors.white,
             ),
           ),
           SizedBox(),
@@ -47,12 +47,57 @@ class _OwasTabState extends State<OwasTab> {
             '0' + value.toString(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: kTitleColor,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 45.0,
             ),
           ),
           SizedBox(),
+        ],
+      ),
+    );
+  }
+
+  Widget _valueContainer(
+      String title, List<SingleData> seriesData, Color decorationColor) {
+    int value = (seriesData.isNotEmpty) ? seriesData.last.value.toInt() : 0;
+
+    return Container(
+      width: 50.0,
+      padding: EdgeInsets.all(3),
+      margin: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            //                    <--- bottom side
+            color: decorationColor,
+            width: 3.0,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: kTextColor,
+              fontSize: 9.0,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            value.toInt().toString(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: kTextColor,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -74,7 +119,6 @@ class _OwasTabState extends State<OwasTab> {
             SizedBox(
               height: 40,
             ),
-            _owasLevel(owasData.last),
             SizedBox(
               height: 20,
             ),
@@ -86,14 +130,49 @@ class _OwasTabState extends State<OwasTab> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    spreadRadius: 1,
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 0.5,
                     blurRadius: 10,
-                    offset: Offset(0, 5), // changes position of shadow
+                    offset: Offset(0, 1), // changes position of shadow
                   )
                 ],
               ),
-              child: lineChart("", imuData[0]),
+              child: Column(
+                children: <Widget>[
+                  _owasLevel(owasData.last),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        _valueContainer(
+                          "Back",
+                          imuData[0].multiSeriesData[0].seriesData,
+                          kSeriesColors[0],
+                        ),
+                        _valueContainer(
+                          "Arms",
+                          imuData[0].multiSeriesData[1].seriesData,
+                          kSeriesColors[1],
+                        ),
+                        _valueContainer(
+                          "Legs",
+                          imuData[0].multiSeriesData[2].seriesData,
+                          kSeriesColors[2],
+                        ),
+                        _valueContainer(
+                          "Load",
+                          imuData[0].multiSeriesData[3].seriesData,
+                          kSeriesColors[3],
+                        ),
+                      ],
+                    ),
+                  ),
+                  lineChart("", imuData[0]),
+                ],
+              ),
             ),
             SizedBox(
               height: 30,

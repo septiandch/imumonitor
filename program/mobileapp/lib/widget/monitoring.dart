@@ -111,10 +111,10 @@ class _MonitorState extends State<Monitor> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 5), // changes position of shadow
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 0.5,
+            blurRadius: 10,
+            offset: Offset(0, 2), // changes position of shadow
           )
         ],
       ),
