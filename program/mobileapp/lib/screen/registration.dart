@@ -12,6 +12,7 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
   User _user;
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -52,8 +53,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       }
     });
   }
-
-  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
   void _showSnackBar(String text) {
     _scaffoldState.currentState.showSnackBar(SnackBar(

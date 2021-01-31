@@ -155,6 +155,7 @@ class _SettingTabState extends State<SettingTab> {
     widget.callBackFunc();
   }
 
+  /*
   _manualInputDialog(BuildContext context, String title) {
     TextEditingController controller = TextEditingController();
 
@@ -185,6 +186,7 @@ class _SettingTabState extends State<SettingTab> {
           );
         });
   }
+  */
 
   @override
   Widget build(BuildContext context) {

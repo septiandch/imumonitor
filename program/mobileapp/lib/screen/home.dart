@@ -6,6 +6,7 @@ import '../tabs/owas.dart';
 import '../tabs/sensor.dart';
 import '../tabs/setting.dart';
 import '../widget/imucontainer.dart';
+import '../method/post.dart';
 import '../config/colorscheme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,13 +18,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
   final List<String> pageList = ["OWAS Level", "Sensor Monitor", "Setting"];
 
   DeviceSelection _selectedDevice;
   TabController _controller;
   String _pageName;
   bool _btState;
-  bool _listenStart = false;
+  bool _updateFlag;
   Timer _timer;
   DateTime _now;
 
@@ -65,12 +67,49 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  _showSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(seconds: 1),
+    );
+    _scaffoldState.currentState.showSnackBar(snackBar);
+  }
+
+  _submitData() async {
+    _now = DateTime.now();
+    PostForm postForm = PostForm(
+      '${_now.hour.toString()}:${_now.minute.toString()}:${_now.second.toString()}',
+      ImuContainer.of(context).user,
+      ImuContainer.of(context).currentData,
+    );
+
+    PostController postController = PostController();
+
+    _showSnackbar("Submitting Feedback");
+
+    await postController.submitForm(postForm, (String response) {
+      print("Response: $response");
+      if (response == PostController.STATUS_SUCCESS) {
+        // Feedback is saved succesfully in Google Sheets.
+        _showSnackbar("Feedback Submitted");
+      } else {
+        // Error Occurred while saving data in Google Sheets.
+        _showSnackbar("Error Occurred!");
+      }
+    });
+  }
+
   void _deviceListen(List<int> rawValue) {
     _now = DateTime.now();
     List<String> value = intToString(rawValue).split(',');
-    print(value);
+    //print(value);
 
-    //if (_listenStart) {
+    ImuContainer.of(context).updateCurrentData(
+        int.parse(value[0]),
+        (value[0] == '1')
+            ? "${value[1]},${value[2]},${value[3]},${value[4]},${value[5]}"
+            : "${value[1]},${value[2]},${value[3]}");
+
     setState(() {
       ImuContainer.of(context).updateSeriesData(
         int.parse(value[0]),
@@ -88,7 +127,20 @@ class _HomeScreenState extends State<HomeScreen>
         ],
       );
     });
-    //}
+
+    // do post request after data receiving is completed
+    if (_updateFlag && (value[0] == '8')) {
+      _submitData();
+
+      _updateFlag = false;
+    }
+
+    // Wait for all data received
+    if (ImuContainer.of(context)
+        .currentData
+        .every((element) => element != null)) {
+      _updateFlag = true;
+    }
   }
 
   IconData _bluetoothStatus(bool state) {
@@ -150,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen>
       });
 
       setState(() {
-        _listenStart = false;
+        _updateFlag = false;
         _btState = true;
       });
     }
@@ -161,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen>
     disconnectFromDevice(_selectedDevice.device);
 
     setState(() {
-      _listenStart = false;
+      _updateFlag = false;
       _btState = false;
       _selectedDevice = null;
     });
@@ -171,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
+        key: _scaffoldState,
         backgroundColor: kBackgroundColor,
         // Appbar
         appBar: AppBar(

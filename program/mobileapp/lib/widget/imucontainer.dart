@@ -21,6 +21,7 @@ class ImuContainer extends StatefulWidget {
   final List<MultiSeriesData> imuDataBase;
   final List<int> owasDataBase;
   final List<int> settingValue;
+  final List<String> currentData;
 
   ImuContainer({
     @required this.child,
@@ -28,6 +29,7 @@ class ImuContainer extends StatefulWidget {
     this.imuDataBase,
     this.owasDataBase,
     this.settingValue,
+    this.currentData,
   });
 
   static _ImuContainerState of(BuildContext context) {
@@ -41,10 +43,11 @@ class ImuContainer extends StatefulWidget {
 }
 
 class _ImuContainerState extends State<ImuContainer> {
-  User user;
+  User user = User();
   List<int> owasDataBase = List<int>();
   List<int> settingValue = List<int>.generate(settingList.length,
       (index) => (index == settingList.length - 1) ? 10 : 180);
+  List<String> currentData = List<String>(8);
 
   List<MultiSeriesData> imuDataBase = List<MultiSeriesData>.generate(
     8,
@@ -141,17 +144,23 @@ class _ImuContainerState extends State<ImuContainer> {
     print('saved $text');
   }
 
+  void updateCurrentData(int index, String data) {
+    currentData[index - 1] = data;
+  }
+
+  String getCurrentData(int index) {
+    return currentData[index];
+  }
+
   void updateSeriesData(int index, String time, List<int> value) {
-    setState(() {
-      for (var i = 0; i < value.length; i++) {
-        (i == 4)
-            ? owasDataBase.add(value[i])
-            : imuDataBase[index - 1]
-                .multiSeriesData[i]
-                .seriesData
-                .add(SingleData(time, value[i].toDouble()));
-      }
-    });
+    for (var i = 0; i < value.length; i++) {
+      (i == 4)
+          ? owasDataBase.add(value[i])
+          : imuDataBase[index - 1]
+              .multiSeriesData[i]
+              .seriesData
+              .add(SingleData(time, value[i].toDouble()));
+    }
   }
 
   @override
