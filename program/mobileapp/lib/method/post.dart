@@ -3,55 +3,58 @@ import 'package:http/http.dart' as http;
 import '../widget/imucontainer.dart';
 
 class PostForm {
+  String date;
   String time;
   User user;
   List<String> data;
 
   PostForm(
+    this.date,
     this.time,
     this.user,
     this.data,
   );
 
-  /*
   factory PostForm.fromJson(dynamic json) {
     return PostForm(
+      "${json['date']}",
+      "${json['time']}",
       User(
         name: "${json['name']}",
         age: int.parse("${json['age']}"),
         height: int.parse("${json['height']}"),
         weight: int.parse("${json['weight']}"),
       ),
-      /*
-      "${json['owas']}",
-      "${json['back']}",
-      "${json['arms']}",
-      "${json['legs']}",
-      "${json['s1Roll']}",
-      "${json['S1Pitch']}",
-      "${json['S1Yaw']}",
-      "${json['s2Roll']}",
-      "${json['S2Pitch']}",
-      "${json['S2Yaw']}",
-      "${json['s3Roll']}",
-      "${json['S3Pitch']}",
-      "${json['S3Yaw']}",
-      "${json['s4Roll']}",
-      "${json['S4Pitch']}",
-      "${json['S4Yaw']}",
-      "${json['s5Roll']}",
-      "${json['S5Pitch']}",
-      "${json['S5Yaw']}",
-      "${json['s6Roll']}",
-      "${json['S6Pitch']}",
-      "${json['S6Yaw']}",
-      "${json['s7Roll']}",
-      "${json['S7Pitch']}",
-      "${json['S7Yaw']}",
-      */
+      <String>[
+        "${json['owas']}",
+        "${json['oBack']}",
+        "${json['oArms']}",
+        "${json['oLegs']}",
+        "${json['oLoad']}",
+        "${json['s1r']}",
+        "${json['s1p']}",
+        "${json['s1y']}",
+        "${json['s2r']}",
+        "${json['s2p']}",
+        "${json['s2y']}",
+        "${json['s3r']}",
+        "${json['s3p']}",
+        "${json['s3y']}",
+        "${json['s4r']}",
+        "${json['s4p']}",
+        "${json['s4y']}",
+        "${json['s5r']}",
+        "${json['s5p']}",
+        "${json['s5y']}",
+        "${json['s6r']}",
+        "${json['s6p']}",
+        "${json['s6y']}",
+        "${json['s7r']}",
+        "${json['s7p']}",
+        "${json['s7y']}",
+      ],
     );
   }
-  */
 
   // Method to make GET parameters.
   Map toJson() {
@@ -59,16 +62,17 @@ class PostForm {
         this.data.length, (index) => this.data[index].split(','));
 
     Map map = {
-      'time': time,
+      'date': "'" + date,
+      'time': "'" + time,
       'name': user.name,
       'age': user.age.toString(),
       'height': user.height.toString(),
       'weight': user.weight.toString(),
-      'owas': _data[0][0],
-      'oBack': _data[0][1],
-      'oArms': _data[0][2],
-      'oLegs': _data[0][3],
-      'oLoad': _data[0][4],
+      'oBack': _data[0][0],
+      'oArms': _data[0][1],
+      'oLegs': _data[0][2],
+      'oLoad': _data[0][3],
+      'owas': _data[0][4],
     };
 
     for (var i = 1; i < _data.length; i++) {
@@ -110,5 +114,23 @@ class PostController {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<List<PostForm>> getData(String date) async {
+    return await http.get(URL + '?arg=' + date).then((response) {
+      var jsonFeedback = convert.jsonDecode(response.body) as List;
+      return jsonFeedback.map((json) => PostForm.fromJson(json)).toList();
+    });
+  }
+
+  String dateListFromJson(dynamic json) {
+    return "${json['date']}";
+  }
+
+  Future<List<String>> getAvailableDate() async {
+    return await http.get(URL + '?arg=getdate').then((response) {
+      var jsonFeedback = convert.jsonDecode(response.body) as List;
+      return jsonFeedback.map((json) => dateListFromJson(json)).toList();
+    });
   }
 }

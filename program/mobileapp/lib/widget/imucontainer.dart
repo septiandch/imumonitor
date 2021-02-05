@@ -76,6 +76,30 @@ class _ImuContainerState extends State<ImuContainer> {
     super.initState();
   }
 
+  clearData() {
+    owasDataBase = List<int>();
+
+    imuDataBase = List<MultiSeriesData>.generate(
+      8,
+      (index) => (index == 0)
+          ? MultiSeriesData(
+              <SeriesData>[
+                SeriesData("Back", List<SingleData>()),
+                SeriesData("Arms", List<SingleData>()),
+                SeriesData("Legs", List<SingleData>()),
+                SeriesData("Load", List<SingleData>()),
+              ],
+            )
+          : MultiSeriesData(
+              <SeriesData>[
+                SeriesData("Roll", List<SingleData>()),
+                SeriesData("Pitch", List<SingleData>()),
+                SeriesData("Yaw", List<SingleData>()),
+              ],
+            ),
+    );
+  }
+
   updateUserData(User _user) async {
     final prefs = await SharedPreferences.getInstance();
     final key = 'user_data';

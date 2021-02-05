@@ -78,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen>
   _submitData() async {
     _now = DateTime.now();
     PostForm postForm = PostForm(
+      '${_now.year.toString()}-${_now.month.toString()}-${_now.day.toString()}',
       '${_now.hour.toString()}:${_now.minute.toString()}:${_now.second.toString()}',
       ImuContainer.of(context).user,
       ImuContainer.of(context).currentData,
@@ -102,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen>
   void _deviceListen(List<int> rawValue) {
     _now = DateTime.now();
     List<String> value = intToString(rawValue).split(',');
-    //print(value);
 
     ImuContainer.of(context).updateCurrentData(
         int.parse(value[0]),

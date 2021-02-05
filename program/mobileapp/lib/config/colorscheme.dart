@@ -20,8 +20,8 @@ const List<Color> kSeriesColors2 = [
 ];
 const List<Color> kOwasColors = [
   Color(0x2F000000),
-  Color(0xFF4BC076),
   Color(0xFF188CF6),
+  Color(0xFF4BC076),
   Color(0xFFFDB858),
   Color(0xFFF84F4F),
 ];

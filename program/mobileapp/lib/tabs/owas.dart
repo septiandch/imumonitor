@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../widget/linechart.dart';
 import '../widget/imucontainer.dart';
+import '../method/post.dart';
 import '../config/colorscheme.dart';
 
 class OwasTab extends StatefulWidget {
@@ -9,9 +11,12 @@ class OwasTab extends StatefulWidget {
 }
 
 class _OwasTabState extends State<OwasTab> {
-  User user;
-  List<MultiSeriesData> imuData;
-  List<int> owasData;
+  User _user;
+  List<MultiSeriesData> _imuData;
+  List<int> _owasData;
+  List<String> _availableDate = List<String>();
+  String _selectedDateTitle;
+  int _selectedDateIndex;
 
   Widget _owasLevel(int value) {
     return Container(
@@ -103,12 +108,98 @@ class _OwasTabState extends State<OwasTab> {
     );
   }
 
+  _changeDate(bool bNextPrev) async {
+    if (_availableDate.isNotEmpty) {
+      DateTime now = DateTime.now();
+      List<String> _reverseDateList = List.from(_availableDate.reversed);
+
+      if (!bNextPrev && _selectedDateIndex < _availableDate.length) {
+        _selectedDateIndex++;
+      } else if (bNextPrev && _selectedDateIndex > 0) {
+        _selectedDateIndex--;
+      }
+
+      setState(() {
+        (_selectedDateIndex == 0)
+            ? _selectedDateTitle = 'Hari ini'
+            : _selectedDateTitle = _reverseDateList[_selectedDateIndex];
+      });
+
+      await _getData(_reverseDateList[_selectedDateIndex]);
+    }
+  }
+
+  _getData(String date) async {
+    if (_availableDate.isNotEmpty) {
+      PostController postController = PostController();
+      List<PostForm> data = List<PostForm>();
+
+      data = await postController.getData(date);
+
+      if (data.isNotEmpty) {
+        ImuContainer.of(context).clearData();
+
+        for (var i = 0; i < data.length; i++) {
+          List<int> values =
+              data[i].data.map((value) => int.parse(value)).toList();
+
+          ImuContainer.of(context).updateSeriesData(
+            1,
+            data[i].time,
+            <int>[
+              values[0],
+              values[1],
+              values[2],
+              values[3],
+              values[4],
+            ],
+          );
+
+          for (var j = 0; j < 7; j++) {
+            ImuContainer.of(context).updateSeriesData(
+              (j + 2),
+              data[i].time,
+              <int>[
+                values[5 + (j * 3)],
+                values[6 + (j * 3)],
+                values[7 + (j * 3)],
+              ],
+            );
+          }
+        }
+
+        setState(() {});
+      }
+    }
+  }
+
+  _getAvailableDate() async {
+    if (_availableDate.isEmpty) {
+      PostController postController = PostController();
+      String today = DateFormat('yyyy-M-d').format(DateTime.now());
+
+      _availableDate = await postController.getAvailableDate();
+
+      if (!_availableDate.contains(today)) {
+        _availableDate.add(today);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    _selectedDateIndex = 0;
+    _selectedDateTitle = 'Hari ini';
+  }
+
   @override
   Widget build(BuildContext context) {
     final inheritContainer = ImuContainer.of(context);
-    user = inheritContainer.user;
-    imuData = inheritContainer.imuDataBase;
-    owasData = inheritContainer.owasDataBase;
+    _user = inheritContainer.user;
+    _imuData = inheritContainer.imuDataBase;
+    _owasData = inheritContainer.owasDataBase;
+
+    _getAvailableDate();
 
     return Container(
       child: Center(
@@ -139,7 +230,7 @@ class _OwasTabState extends State<OwasTab> {
               ),
               child: Column(
                 children: <Widget>[
-                  _owasLevel(owasData.last),
+                  _owasLevel(_owasData.last),
                   SizedBox(
                     height: 20,
                   ),
@@ -149,28 +240,28 @@ class _OwasTabState extends State<OwasTab> {
                       children: <Widget>[
                         _valueContainer(
                           "Back",
-                          imuData[0].multiSeriesData[0].seriesData,
+                          _imuData[0].multiSeriesData[0].seriesData,
                           kSeriesColors[0],
                         ),
                         _valueContainer(
                           "Arms",
-                          imuData[0].multiSeriesData[1].seriesData,
+                          _imuData[0].multiSeriesData[1].seriesData,
                           kSeriesColors[1],
                         ),
                         _valueContainer(
                           "Legs",
-                          imuData[0].multiSeriesData[2].seriesData,
+                          _imuData[0].multiSeriesData[2].seriesData,
                           kSeriesColors[2],
                         ),
                         _valueContainer(
                           "Load",
-                          imuData[0].multiSeriesData[3].seriesData,
+                          _imuData[0].multiSeriesData[3].seriesData,
                           kSeriesColors[3],
                         ),
                       ],
                     ),
                   ),
-                  lineChart("", imuData[0]),
+                  lineChart("", _imuData[0]),
                 ],
               ),
             ),
@@ -182,14 +273,20 @@ class _OwasTabState extends State<OwasTab> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Icon(
-                    Icons.navigate_before,
-                    color: kTextColor,
-                    size: 50,
+                  IconButton(
+                    icon: Icon(
+                      Icons.navigate_before,
+                      color: kTextColor,
+                    ),
+                    iconSize: 50,
+                    onPressed: () {
+                      //_getData(false);
+                      _changeDate(false);
+                    },
                   ),
                   SizedBox(),
                   Text(
-                    "Hari Ini",
+                    _selectedDateTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: kTextColor,
@@ -198,10 +295,15 @@ class _OwasTabState extends State<OwasTab> {
                     ),
                   ),
                   SizedBox(),
-                  Icon(
-                    Icons.navigate_next,
-                    color: kTextColor,
-                    size: 50,
+                  IconButton(
+                    icon: Icon(
+                      Icons.navigate_next,
+                      color: kTextColor,
+                    ),
+                    iconSize: 50,
+                    onPressed: () {
+                      _changeDate(true);
+                    },
                   ),
                 ],
               ),
@@ -209,43 +311,6 @@ class _OwasTabState extends State<OwasTab> {
             SizedBox(
               height: 55,
             ),
-            /*
-            SizedBox(
-              height: 55,
-              child: RaisedButton(
-                onPressed: () {
-                  /*
-                  DateTime _now = DateTime.now();
-
-                  inheritContainer.updateSeriesData(
-                    1,
-                    _now.hour.toString() +
-                        ":" +
-                        _now.minute.toString() +
-                        ":" +
-                        _now.second.toString(),
-                    <double>[
-                      Random().nextInt(360).toDouble(),
-                      Random().nextInt(360).toDouble(),
-                      Random().nextInt(360).toDouble(),
-                      Random().nextInt(360).toDouble(),
-                    ],
-                  );
-
-                  setState(() {});
-                  */
-                },
-                color: kButtonColor,
-                padding: const EdgeInsets.all(18.0),
-                child: Text(
-                  "Submit",
-                  style: TextStyle(
-                    color: kTitleColor,
-                  ),
-                ),
-              ),
-            ),
-            */
           ],
         ),
       ),
