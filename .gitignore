@@ -118,3 +118,8 @@ app.*.symbols
 
 # Platformio
 .pio
+
+
+# Hardware
+*.stl
+*.FCStd1
