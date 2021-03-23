@@ -11,7 +11,6 @@ class OwasTab extends StatefulWidget {
 }
 
 class _OwasTabState extends State<OwasTab> {
-  User _user;
   List<MultiSeriesData> _imuData;
   List<int> _owasData;
   List<String> _availableDate = List<String>();
@@ -109,8 +108,9 @@ class _OwasTabState extends State<OwasTab> {
   }
 
   _changeDate(bool bNextPrev) async {
+    ImuContainer.of(context).clearData();
+
     if (_availableDate.isNotEmpty) {
-      DateTime now = DateTime.now();
       List<String> _reverseDateList = List.from(_availableDate.reversed);
 
       if (!bNextPrev && _selectedDateIndex < _availableDate.length) {
@@ -137,8 +137,6 @@ class _OwasTabState extends State<OwasTab> {
       data = await postController.getData(date);
 
       if (data.isNotEmpty) {
-        ImuContainer.of(context).clearData();
-
         for (var i = 0; i < data.length; i++) {
           List<int> values =
               data[i].data.map((value) => int.parse(value)).toList();
@@ -188,6 +186,8 @@ class _OwasTabState extends State<OwasTab> {
 
   @override
   void initState() {
+    super.initState();
+
     _selectedDateIndex = 0;
     _selectedDateTitle = 'Hari ini';
   }
@@ -195,7 +195,6 @@ class _OwasTabState extends State<OwasTab> {
   @override
   Widget build(BuildContext context) {
     final inheritContainer = ImuContainer.of(context);
-    _user = inheritContainer.user;
     _imuData = inheritContainer.imuDataBase;
     _owasData = inheritContainer.owasDataBase;
 
@@ -204,15 +203,10 @@ class _OwasTabState extends State<OwasTab> {
     return Container(
       child: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           // center the children
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 40,
-            ),
-            SizedBox(
-              height: 20,
-            ),
             Container(
               width: MediaQuery.of(context).size.width * 0.75,
               padding: EdgeInsets.all(20),
@@ -261,12 +255,17 @@ class _OwasTabState extends State<OwasTab> {
                       ],
                     ),
                   ),
-                  lineChart("", _imuData[0]),
+                  LineChart.withHeight(
+                    "",
+                    _imuData[0],
+                    MediaQuery.of(context).size.height * 0.30,
+                  ),
+                  // LineChart("", _imuData[0]),
                 ],
               ),
             ),
             SizedBox(
-              height: 30,
+              height: 20,
             ),
             Container(
               width: MediaQuery.of(context).size.width * 0.75,
@@ -307,9 +306,6 @@ class _OwasTabState extends State<OwasTab> {
                   ),
                 ],
               ),
-            ),
-            SizedBox(
-              height: 55,
             ),
           ],
         ),

@@ -5,13 +5,30 @@ import '../screen/saved.dart';
 import '../screen/registration.dart';
 import '../config/colorscheme.dart';
 
-const List<String> settingList = [
-  "Back",
-  "Upper Arms",
-  "Lower Arms",
-  "Upper Legs",
-  "Lower Legs",
-  "Update Interval",
+class SettingParam {
+  final String name;
+  final int initval;
+  final int range;
+  final int min;
+  final int max;
+
+  SettingParam(
+    this.name,
+    this.initval,
+    this.range,
+  )   : min = initval - range,
+        max = initval + range;
+}
+
+List<SettingParam> settingList = [
+  SettingParam("Back Bent", 30, 15),
+  SettingParam("Back Twist", 30, 15),
+  SettingParam("Shoulder Level", 90, 20),
+  SettingParam("Sit Range", 90, 20),
+  SettingParam("Standing Range", 0, 15),
+  SettingParam("Squatting Range", 110, 30),
+  SettingParam("Kneeling Range", 90, 30),
+  SettingParam("Walking Range", 20, 15),
 ];
 
 class SettingTab extends StatefulWidget {
@@ -31,6 +48,8 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Widget _valuePicker(String title, int min, int max, BuildContext context) {
+    int index = settingList.indexWhere((element) => element.name == title);
+
     return GestureDetector(
       onLongPress: () {
         // _manualInputDialog(context, title);
@@ -49,7 +68,7 @@ class _SettingTabState extends State<SettingTab> {
                   style: TextStyle(
                     color: kTextColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
+                    fontSize: 18.0,
                   ),
                 ),
               ),
@@ -62,7 +81,7 @@ class _SettingTabState extends State<SettingTab> {
                   ),
                 ),
                 child: NumberPicker.horizontal(
-                  initialValue: _currentValue[settingList.indexOf(title)],
+                  initialValue: _currentValue[index],
                   minValue: min,
                   maxValue: max,
                   step: 1,
@@ -77,7 +96,8 @@ class _SettingTabState extends State<SettingTab> {
                     fontSize: 12.0,
                   ),
                   onChanged: (value) => setState(
-                      () => _currentValue[settingList.indexOf(title)] = value),
+                    () => _currentValue[index] = value,
+                  ),
                 ),
               ),
             ],
@@ -91,38 +111,41 @@ class _SettingTabState extends State<SettingTab> {
   }
 
   Widget _button(String title, IconData icon, VoidCallback func) {
-    return SizedBox(
-      height: 60,
-      width: MediaQuery.of(context).size.width * 0.8,
-      child: RaisedButton(
-        onPressed: func,
-        color: kButtonColor,
-        padding: const EdgeInsets.all(18.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              icon,
-              color: kTitleColor,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Container(
-              width: 120,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: kTitleColor,
-                  fontSize: 18.0,
+    return Container(
+      padding: EdgeInsets.only(top: 10, bottom: 10),
+      child: SizedBox(
+        height: 60,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: RaisedButton(
+          onPressed: func,
+          color: kButtonColor,
+          padding: const EdgeInsets.all(18.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                icon,
+                color: kTitleColor,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: 120,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: kTitleColor,
+                    fontSize: 18.0,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -136,8 +159,8 @@ class _SettingTabState extends State<SettingTab> {
         if (values.isNotEmpty)
           _currentValue = values;
         else
-          _currentValue = List<int>.generate(settingList.length,
-              (index) => (index == settingList.length - 1) ? 10 : 180);
+          _currentValue = List<int>.generate(
+              settingList.length, (index) => settingList[index].initval);
       });
     }
   }
@@ -155,38 +178,30 @@ class _SettingTabState extends State<SettingTab> {
     widget.callBackFunc();
   }
 
-  /*
-  _manualInputDialog(BuildContext context, String title) {
-    TextEditingController controller = TextEditingController();
-
-    return showDialog(
+  void _settingModalBottomSheet(context, String title) {
+    showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.transparent,
         builder: (context) {
-          return AlertDialog(
-            title: Text('Batas Sudut'),
-            content: TextField(
-              controller: controller,
-              textInputAction: TextInputAction.go,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration: InputDecoration(hintText: ""),
+          return Container(
+            height: 380,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+              ),
             ),
-            actions: <Widget>[
-              FlatButton(
-                child: new Text('OK'),
-                onPressed: () {
-                  setState(() {
-                    _currentValue[settingList.indexOf(title)] =
-                        int.parse(controller.text);
-                  });
-
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
+            width: MediaQuery.of(context).size.width * 0.75,
+            padding: EdgeInsets.all(20),
+            child: Text("Test"),
           );
         });
   }
-  */
+
+  void _openBottomSheet() {
+    _settingModalBottomSheet(context, "title");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,17 +219,13 @@ class _SettingTabState extends State<SettingTab> {
                 height: 30,
               ),
               if (_currentValue.isNotEmpty)
-                for (String element in settingList)
-                  (settingList.indexOf(element) != settingList.length - 1)
-                      ? _valuePicker(element, 0, 360, context)
-                      : _valuePicker(element, 1, 60, context),
+                for (SettingParam element in settingList)
+                  _valuePicker(element.name, element.min, element.max, context),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
+              // _button("Test", Icons.add, _openBottomSheet),
               _button("Simpan", Icons.save, _toSavedScreen),
-              SizedBox(
-                height: 20,
-              ),
               _button("Ganti User", Icons.person, _toRegistrationScreen),
             ],
           ),

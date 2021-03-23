@@ -92,7 +92,7 @@ class _MonitorState extends State<Monitor> {
             ),
             width: MediaQuery.of(context).size.width * 0.75,
             padding: EdgeInsets.all(20),
-            child: lineChart(
+            child: LineChart(
               title,
               value,
             ),
