@@ -53,7 +53,7 @@ class MPU_
 #endif
 
 #ifdef ENABLE_AVERAGING_FILTER
-	#define TOTAL_SAMPLE 500
+	#define TOTAL_SAMPLE 150
 	#define VALUE_DIFF_LIMIT 20
 
 	uint16_t sample_count = 0;
