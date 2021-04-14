@@ -86,13 +86,13 @@ class _HomeScreenState extends State<HomeScreen>
 
     PostController postController = PostController();
 
-    _showSnackbar("Submitting Feedback");
+    // _showSnackbar("Submitting Feedback");
 
     await postController.submitForm(postForm, (String response) {
       print("Response: $response");
       if (response == PostController.STATUS_SUCCESS) {
         // Feedback is saved succesfully in Google Sheets.
-        _showSnackbar("Feedback Submitted");
+        // _showSnackbar("Feedback Submitted");
       } else {
         // Error Occurred while saving data in Google Sheets.
         _showSnackbar("Error Occurred!");

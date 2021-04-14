@@ -30,7 +30,7 @@ class Monitor extends StatefulWidget {
 class _MonitorState extends State<Monitor> {
   Widget _valueContainer(String title, double value, Color decorationColor) {
     return Container(
-      width: 65.0,
+      width: 75.0,
       padding: EdgeInsets.fromLTRB(8, 1, 5, 1),
       decoration: BoxDecoration(
         border: Border(
@@ -103,7 +103,7 @@ class _MonitorState extends State<Monitor> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
+      width: MediaQuery.of(context).size.width * 0.85,
       margin: EdgeInsets.only(bottom: 20.0),
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -141,7 +141,7 @@ class _MonitorState extends State<Monitor> {
                     ),
                   ),
                 SizedBox(
-                  width: 10,
+                  width: 2,
                 ),
                 Container(
                   child: Row(

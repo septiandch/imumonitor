@@ -40,7 +40,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             (text == "") ? _user.height = 0 : _user.height = int.parse(text);
           }
           break;
-        case 'Berat Badan':
+        case 'Berat Beban':
           {
             (text == "") ? _user.weight = 0 : _user.weight = int.parse(text);
           }
@@ -105,7 +105,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   SizedBox(
                     height: 30,
                   ),
-                  TextBox("Berat Badan", "Kg", numberInput, submit),
+                  TextBox("Berat Beban", "Kg", numberInput, submit),
                   SizedBox(
                     height: 30,
                   ),
