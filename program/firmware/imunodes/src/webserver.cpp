@@ -187,7 +187,7 @@ String webserver_prePostRequest(String sNodeId)
 	return payload;
 }
 
-String webserver_postRequest(String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt)
+String webserver_getRequest(String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt, String others)
 {
 	String payload;
 	int httpCode;
@@ -200,6 +200,11 @@ String webserver_postRequest(String sNodeId, int nRoll, int nPitch, int nYaw, lo
 						"&mro="			+ String(dwRollMov, DEC) +
 						"&mpi="			+ String(dwPitchMov, DEC) +
 						"&bat=" 		+ String(bBatt, DEC);
+
+	if(others != "")
+	{
+		message += others;
+	}
 
 	HTTPClient http;
 	http.begin(server + message);
