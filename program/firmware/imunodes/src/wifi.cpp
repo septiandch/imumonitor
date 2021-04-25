@@ -38,6 +38,11 @@ void wifi_connect()
 #	endif
 }
 
+void wifi_reconnect()
+{
+	WiFi.reconnect();
+}
+
 void wifi_disconnect()
 {
 	WiFi.disconnect();

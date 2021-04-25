@@ -14,20 +14,25 @@ void webserver_init()
 
 void webserver_commandCheck(String cmd)
 {
-    if(cmd != CMD_NONE || cmd != CMD_WAIT)
+    if(cmd.indexOf(CMD_WAIT) > 0 )
 	{
-		if (cmd.indexOf(CMD_CALIBRATE) > 0)
-		{
-			sensor_calibGyro();
-		}
-		else if (cmd.indexOf(CMD_RESTART) > 0)
-		{
-			ESP.restart();
-		}
-		else if (cmd.indexOf(CMD_DISCONNECT) > 0)
-		{			
-			wifi_disconnect();
-		}
+		/* wait... */
+	}
+	else if (cmd.indexOf(CMD_CALIBRATE) > 0)
+	{
+		sensor_calibGyro();
+	}
+	else if (cmd.indexOf(CMD_RESTART) > 0)
+	{
+		ESP.restart();
+	}
+	else if (cmd.indexOf(CMD_DISCONNECT) > 0)
+	{	
+		wifi_disconnect();
+	}
+	else
+	{
+		wifi_disconnect();
 	}
 }
 
@@ -115,7 +120,7 @@ void  webserver_checkClientRequest()
 						// The HTTP response ends with another blank line
 						client.println();
 						
-						// turns the GPIOs on and off
+						/*
 						if (header.indexOf("GET /calibrate") >= 0)
 						{
 							webserver_commandCheck(CMD_CALIBRATE);
@@ -128,6 +133,7 @@ void  webserver_checkClientRequest()
 						{
 							webserver_commandCheck(CMD_DISCONNECT);
 						}
+						*/
 
 						break;
 					}
@@ -176,7 +182,7 @@ String webserver_prePostRequest(String sNodeId)
 
 	http.end();
 
-	webserver_commandCheck(payload);
+	/* webserver_commandCheck(payload); */
 
 	return payload;
 }
@@ -210,7 +216,7 @@ String webserver_postRequest(String sNodeId, int nRoll, int nPitch, int nYaw, lo
 
 	http.end();
 
-	webserver_commandCheck(payload);
+	/* webserver_commandCheck(payload); */
 
 	return payload;
 }

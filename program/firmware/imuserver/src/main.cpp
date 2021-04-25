@@ -11,43 +11,47 @@
 #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-enum nodeIdEnum
+#define PIN_BUZZER		12
+#define PIN_VIBRATOR	13
+
+enum eNodeIdEnum
 {
-	ID_OWAS = 0,
-	ID_BACK,
-	ID_RARM,
-	ID_LARM,
-	ID_RULEG,
-	ID_RLLEG,
-	ID_LULEG,
-	ID_LLLEG,
-	ID_END
+	eID_OWAS = 0,
+	eID_BACK,
+	eID_RARM,
+	eID_LARM,
+	eID_RULEG,
+	eID_RLLEG,
+	eID_LULEG,
+	eID_LLLEG,
+	eID_SIZE
 };
 
-bool bNodeFlag[ID_END];
+bool bNodeFlag[eID_SIZE];
+long dwNodeTimeGap[eID_SIZE];
 bool bDebugState = false;
 
-
-enum nodeEnum
+enum eNodeEnum
 {
-	DATA_ID = 0,
-	DATA_ROL,
-	DATA_PIT,
-	DATA_YAW,
-	DATA_MVR,
-	DATA_MVP,
-	DATA_BAT,
-	DATA_END
+	eDATA_ID = 0,
+	eDATA_ROL,
+	eDATA_PIT,
+	eDATA_YAW,
+	eDATA_BAT,
+	eDATA_MVR,
+	eDATA_MVP,
+	eDATA_SIZE
 };
 
-enum owasEnum
+enum eOwasEnum
 {
-	OWAS_ID = 0,
-	OWAS_BACK,
-	OWAS_ARMS,
-	OWAS_LEGS,
-	OWAS_LOAD,
-	OWAS_LEVEL,
+	eOWAS_ID = 0,
+	eOWAS_BACK,
+	eOWAS_ARMS,
+	eOWAS_LEGS,
+	eOWAS_LOAD,
+	eOWAS_LEVEL,
+	eOWAS_SIZE
 };
 
 const byte bOwasTable[12][21] =
@@ -69,13 +73,21 @@ const byte bOwasTable[12][21] =
 	{	4, 4, 4,	2, 3, 4,	3, 3, 4,	4, 4, 4,	4, 4, 4,	4, 4, 4,	2, 3, 4	},
 };
 
-int nUserLoad		= 15;
-int nLimitArms		= 90;
-int nLimitBackRoll	= 20;
-int nLimitBackPitch	= 20;
-int nLimitLoad1		= 10;
-int nLimitLoad2		= 20;
-int nLimitMov		= 1000;
+enum eLimitSettingEnum
+{
+	eLIM_ARMS = 0,
+	eLIM_BACK_ROLL,
+	eLIM_BACK_PITCH,
+	eLIM_LOAD_1,
+	eLIM_LOAD_2,
+	eLIM_LEG_STAND,
+	eLIM_LEG_BENT,
+	eLIM_LEG_SIT,
+	eLIM_LEG_SQUAT,
+	eLIM_LEG_MOVE,
+	eLIM_LEG_MAX,
+	eLIM_SIZE
+};
 
 // Replace with your network credentials
 const char ssid[]     = "ESP32 BLE";
@@ -83,10 +95,107 @@ const char password[] = "12345678";
 
 // BLE Update Timer
 const unsigned long ulNodeDelay = 200;
+const unsigned long ulWarningDelay = 3000;
 unsigned long ulMillis = 0;
+unsigned long ulWarningMillis = 0;
 int nodeIndex = 0;
 
 bool bDataReadyFlag = false;
+bool bWarningFlag = false;
+String sNodeData;
+
+int nLimitSettings[eLIM_SIZE];
+
+int nLimitDefaults[] = 
+{
+	90,		/* eLIM_ARMS		*/
+	20,		/* eLIM_BACK_ROLL	*/
+	20,		/* eLIM_BACK_PITCH	*/
+	10,		/* eLIM_LOAD_1		*/
+	20,		/* eLIM_LOAD_2		*/
+	0,		/* eLIM_LEG_STAND	*/
+	20,		/* eLIM_LEG_BENT	*/
+	60,		/* eLIM_LEG_SIT		*/
+	120,	/* eLIM_LEG_SQUAT	*/
+	130,	/* eLIM_LEG_MOVE	*/
+	180,	/* eLIM_LEG_MAX		*/
+};
+
+/*
+String strLimitSetting[]
+{
+	"eLIM_ARMS",
+	"eLIM_BACK_ROLL",
+	"eLIM_BACK_PITCH",
+	"eLIM_LOAD_1",
+	"eLIM_LOAD_2",
+	"eLIM_LEG_STAND",
+	"eLIM_LEG_BENT",
+	"eLIM_LEG_SIT",
+	"eLIM_LEG_SQUAT",
+	"eLIM_LEG_MOVE",
+	"eLIM_LEG_MAX",
+	"eLIM_SIZE"
+};
+*/
+
+bool bInitialFlag = true;
+int queue_num = 1;
+unsigned long queue_last_gap = 0;
+const int queue_initial_delay = 60;
+const int delay_pattern[] = {0, 5, 10, 15, 20, 25, 30, 35};
+
+const int initial_delay = 60;
+const int normal_delay = 20;
+
+int queueGetDelayTime(int id)
+{
+	int gap = 0;
+	int retval = 0;
+
+	gap = ((int)((millis() - queue_last_gap) / 1000)) - delay_pattern[id];
+
+	retval = delay_pattern[queue_num] + gap;
+
+	if(bInitialFlag)
+	{
+		retval += queue_initial_delay;
+	}
+
+	Serial.println("------------ >>>>>>>");
+	Serial.print("Delay Time : ");
+	Serial.println(retval);
+	Serial.println("------------ >>>>>>>");
+	
+	if(queue_num++ >= 7)
+	{
+		queue_num = 1;
+	}
+
+	queue_last_gap = millis();
+
+	return retval;
+}
+
+String stringParse(String data, char separator, int index)
+{
+	int i = 0;
+	int found = 0;
+	int strIndex[] = {0, -1};
+	int maxIndex = data.length()-1;
+ 
+ 	for(i = 0; i <= maxIndex && found <= index; i++)
+	{
+		if(data.charAt(i) == separator || i == maxIndex)
+		{
+			found++;
+			strIndex[0] = strIndex[1]+1;
+			strIndex[1] = (i == maxIndex) ? i+1 : i;
+		}
+	}
+
+	return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -94,7 +203,32 @@ WiFiServer server(80);
 BLECharacteristic *pCharacteristic;
 bool bleDeviceConnected = false;
 
-String nodeData[8][8];
+int nUserLoad = 5;
+String nodeData[eID_SIZE][eDATA_SIZE];
+
+void limitSettingInit()
+{
+	int i;
+
+	for(i = 0; i < eLIM_SIZE; i++)
+	{
+		nLimitSettings[i] = nLimitDefaults[i];
+	}
+}
+
+void limitSettingCheck()
+{
+	/*
+	int i;
+
+	for(i = 0; i < eLIM_SIZE; i++)
+	{
+		Serial.print(strLimitSetting[i]);
+		Serial.print(" : ");
+		Serial.println(nLimitSettings[i]);
+	}
+	*/
+}
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -110,28 +244,59 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 	void onWrite(BLECharacteristic *pCharacteristic) {
 		std::string rxValue = pCharacteristic->getValue();
 
+		String strRxData;
+
 		if (rxValue.length() > 0)
 		{
-			Serial.println("*********");
-			Serial.print("Received Value: ");
-
-			for (int i = 0; i < rxValue.length(); i++) {
-			Serial.print(rxValue[i]);
-			}
-
-			pCharacteristic->setValue(rxValue); // Sending a test message
-		
-			pCharacteristic->notify(); // Send the value to the app!
-			Serial.print("*** Sent Value: ");
-			
 			for (int i = 0; i < rxValue.length(); i++)
 			{
-				Serial.print(rxValue[i]);
+				strRxData += rxValue[i];
 			}
-			Serial.println(" ***");
+			
+			/*
+			Serial.println("\n\r\n\r*********");
 
-			Serial.println();
-			Serial.println("*********");
+			Serial.print("Received Value: ");
+			Serial.println(strRxData);
+
+			Serial.println("*********\n\r\n\r");
+			*/
+			
+			if(strRxData.indexOf("user") >= 0)
+			{
+				strRxData = strRxData.substring(5, strRxData.length());
+
+				nUserLoad = stringParse(strRxData, ',', 3).toInt();
+				
+				/*
+				Serial.print("\n\rUser Load : ");
+				Serial.println(nUserLoad);
+				*/
+			}
+			else if(strRxData.indexOf("setting") >= 0)
+			{
+				strRxData = strRxData.substring(8, strRxData.length());
+
+				nLimitSettings[eLIM_ARMS] = stringParse(strRxData, ',', eLIM_ARMS).toInt();
+				nLimitSettings[eLIM_BACK_ROLL] = stringParse(strRxData, ',', eLIM_BACK_ROLL).toInt();
+				nLimitSettings[eLIM_BACK_PITCH] = stringParse(strRxData, ',', eLIM_BACK_PITCH).toInt();
+				nLimitSettings[eLIM_BACK_PITCH] = stringParse(strRxData, ',', eLIM_BACK_PITCH).toInt();
+				nLimitSettings[eLIM_BACK_PITCH] = stringParse(strRxData, ',', eLIM_BACK_PITCH).toInt();
+				nLimitSettings[eLIM_LOAD_1] = stringParse(strRxData, ',', eLIM_LOAD_1).toInt();
+				nLimitSettings[eLIM_LOAD_2] = stringParse(strRxData, ',', eLIM_LOAD_2).toInt();
+				nLimitSettings[eLIM_LEG_STAND] = stringParse(strRxData, ',', eLIM_LEG_STAND).toInt();
+				nLimitSettings[eLIM_LEG_BENT] = stringParse(strRxData, ',', eLIM_LEG_BENT).toInt();
+				nLimitSettings[eLIM_LEG_SIT] = stringParse(strRxData, ',', eLIM_LEG_SIT).toInt();
+				nLimitSettings[eLIM_LEG_SQUAT] = stringParse(strRxData, ',', eLIM_LEG_SQUAT).toInt();
+				nLimitSettings[eLIM_LEG_MOVE] = stringParse(strRxData, ',', eLIM_LEG_MOVE).toInt();
+				nLimitSettings[eLIM_LEG_MAX] = nLimitDefaults[eLIM_LEG_MAX];
+
+				limitSettingCheck();
+
+				digitalWrite(PIN_BUZZER, HIGH);
+				delay(100);
+				digitalWrite(PIN_BUZZER, LOW);
+			}
 		}
     }
 };
@@ -148,12 +313,12 @@ void nodeFlagReset()
 {
 	byte i;
 
-	for(i = 0; i < ID_END; i++)
+	for(i = 0; i < eID_SIZE; i++)
 	{
 		bNodeFlag[i] = false;
 	}
 
-	bNodeFlag[ID_OWAS] = true;
+	bNodeFlag[eID_OWAS] = true;
 }
 
 void nodeFlagSet(byte id)
@@ -166,7 +331,7 @@ bool nodeFlagCheck()
 	bool retval = true;
 	byte i;
 
-	for(i = 0; i < ID_END; i++)
+	for(i = 0; i < eID_SIZE; i++)
 	{
 		if(bNodeFlag[i] == false)
 		{
@@ -178,12 +343,191 @@ bool nodeFlagCheck()
 	return retval;
 }
 
+byte owasBackCheck()
+{
+	byte bBackRoll	= abs(nodeData[eID_BACK][eDATA_ROL].toInt());
+	byte bBackPitch	= abs(nodeData[eID_BACK][eDATA_PIT].toInt());
+	byte bRetVal = 1;
+
+	if(bBackRoll > nLimitSettings[eLIM_BACK_ROLL])
+	{
+		bRetVal = 2;
+	}
+
+	if(bBackPitch > nLimitSettings[eLIM_BACK_PITCH])
+	{
+		bRetVal = 3;
+	}
+
+	if((bBackRoll > nLimitSettings[eLIM_BACK_ROLL])
+		 && (bBackPitch > nLimitSettings[eLIM_BACK_PITCH]))
+	{
+		bRetVal = 4;
+	}
+
+	return bRetVal;
+}
+
+byte owasArmsCheck()
+{
+	byte bLeftArmRoll	= abs(nodeData[eID_LARM][eDATA_ROL].toInt());
+	byte bLeftArmPitch	= abs(nodeData[eID_LARM][eDATA_PIT].toInt());
+	byte bRightArmRoll	= abs(nodeData[eID_RARM][eDATA_ROL].toInt());
+	byte bRightArmPitch	= abs(nodeData[eID_RARM][eDATA_PIT].toInt());
+	byte bRetVal = 1;
+
+	if((bRightArmRoll > nLimitSettings[eLIM_ARMS]) || (bRightArmPitch > nLimitSettings[eLIM_ARMS]))
+	{
+		bRetVal++;
+	}
+
+	if((bLeftArmRoll > nLimitSettings[eLIM_ARMS]) || (bLeftArmPitch > nLimitSettings[eLIM_ARMS]))
+	{
+		bRetVal++;
+	}
+
+	return bRetVal;
+}
+
+bool compareInRange(int value, int limit1, int limit2)
+{
+	bool bRetVal = false;
+
+	if((limit1 <= value ) && (value < limit2))
+	{
+		bRetVal = true;
+	}
+
+	return bRetVal;
+}
+
+byte owasLegsCheck()
+{
+	byte bRightUpperLeg	= abs(nodeData[eID_RULEG][eDATA_ROL].toInt());
+	// byte bRightLowerLeg	= abs(nodeData[eID_RLLEG][eDATA_ROL].toInt());
+	byte bLeftUpperLeg	= abs(nodeData[eID_LULEG][eDATA_ROL].toInt());
+	// byte bLeftLowerLeg	= abs(nodeData[eID_LLLEG][eDATA_ROL].toInt());
+	byte bRightMoveR	= abs(nodeData[eID_RULEG][eDATA_MVR].toInt());
+	byte bRightMoveP	= abs(nodeData[eID_RULEG][eDATA_MVP].toInt());
+	byte bLeftMoveR		= abs(nodeData[eID_LULEG][eDATA_MVR].toInt());
+	byte bLeftMoveP		= abs(nodeData[eID_LULEG][eDATA_MVP].toInt());
+	byte bRetVal = 1;
+
+	/*-- Moving or Walking --*/
+	if((bRightMoveR > nLimitSettings[eLIM_LEG_MOVE] || bRightMoveP > nLimitSettings[eLIM_LEG_MOVE])
+		&& (bLeftMoveR > nLimitSettings[eLIM_LEG_MOVE] || bLeftMoveP > nLimitSettings[eLIM_LEG_MOVE]))
+	{
+		bRetVal = 7;
+	}
+
+	/*-- Standing with one leg --*/
+	else if((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_STAND], nLimitSettings[eLIM_LEG_BENT])
+				&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_MAX]))
+					|| ((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_MAX])
+						&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_STAND], nLimitSettings[eLIM_LEG_BENT]))))
+	{
+		bRetVal = 3;
+	}
+
+	/*-- Stand --*/
+	else if(compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_STAND], nLimitSettings[eLIM_LEG_BENT])
+			&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_STAND], nLimitSettings[eLIM_LEG_BENT]))
+	{
+		bRetVal = 2;
+	}
+
+	/*-- Standing with one leg bent --*/
+	else if((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_SIT])
+			&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_SIT], nLimitSettings[eLIM_LEG_MAX]))
+				|| ((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_SIT], nLimitSettings[eLIM_LEG_MAX])
+					&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_SIT]))))
+	{
+		bRetVal = 5;
+	}
+	
+	/*-- Standing with both legs bent --*/
+	else if((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_SIT])
+				&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_BENT], nLimitSettings[eLIM_LEG_SIT])))
+	{
+		bRetVal = 4;
+	}
+
+	/*-- Sit --*/
+	else if((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_SIT], nLimitSettings[eLIM_LEG_SQUAT])
+			&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_SIT], nLimitSettings[eLIM_LEG_SQUAT])))
+	{
+		bRetVal = 1;
+	}
+
+	/*-- Squatting --*/
+	else if((compareInRange(bRightUpperLeg, nLimitSettings[eLIM_LEG_SQUAT], nLimitSettings[eLIM_LEG_MAX])
+			&& compareInRange(bLeftUpperLeg, nLimitSettings[eLIM_LEG_SQUAT], nLimitSettings[eLIM_LEG_MAX])))
+	{
+		bRetVal = 6;
+	}
+
+	/*-- Default: Sitting --*/
+	else
+	{
+		bRetVal = 1;
+	}
+
+	return bRetVal;
+}
+
+byte owasLoadCheck()
+{
+	byte bRetVal = 1;
+
+	if(nUserLoad >= nLimitSettings[eLIM_LOAD_1] && nUserLoad < nLimitSettings[eLIM_LOAD_2])
+	{
+		bRetVal = 2;
+	}
+	else if(nUserLoad >= nLimitSettings[eLIM_LOAD_2])
+	{
+		bRetVal = 3;
+	}
+
+	return bRetVal;
+}
+
+byte owasJudgement()
+{
+	byte bOwasLeg	= owasLegsCheck();
+	byte bOwasLoad	= owasLoadCheck();
+	byte bOwasBack	= owasBackCheck();
+	byte bOwasArms	= owasArmsCheck();
+
+	byte bColumn	= ((bOwasLeg - 1) * 3) + bOwasLoad;
+	byte bRow		= ((bOwasBack - 1) * 3) + bOwasArms;
+	byte bOwasValue	= bOwasTable[bRow - 1][bColumn - 1];
+	
+	nodeData[eID_OWAS][eOWAS_ID]	= "1";
+	nodeData[eID_OWAS][eOWAS_BACK]	= String(bOwasBack,		DEC);
+	nodeData[eID_OWAS][eOWAS_ARMS]	= String(bOwasArms,		DEC);
+	nodeData[eID_OWAS][eOWAS_LEGS]	= String(bOwasLeg,		DEC);
+	nodeData[eID_OWAS][eOWAS_LOAD]	= String(bOwasLoad,		DEC);
+	nodeData[eID_OWAS][eOWAS_LEVEL]	= String(bOwasValue,	DEC);
+
+	return bOwasValue;
+}
+
+void nodeTimeGapCheck(int id)
+{
+	Serial.print("Elapsed Time : ");
+	Serial.println((millis() - dwNodeTimeGap[id])/1000);
+
+	dwNodeTimeGap[id] = millis();
+}
+
 void clientCheck(WiFiClient client)
 {
 	String header = "";
+	int delaytime = 0;
 
-	if (client)											// If a new client connects,
+	if (client.available())											// If a new client connects,
 	{
+		digitalWrite(LED_BUILTIN, HIGH);
 		String currentLine = "";                // make a String to hold incoming data from the client
 
 		while (client.connected()) 
@@ -191,7 +535,7 @@ void clientCheck(WiFiClient client)
 			if (client.available())
 			{
 				char c = client.read();
-				// Serial.write(c);
+				//Serial.write(c);
 				header += c;
 
 				if (c == '\n') 
@@ -212,31 +556,77 @@ void clientCheck(WiFiClient client)
 						client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
 						client.println("<link rel=\"icon\" href=\"data:,\"></head>");
 						
-						client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");          
-						client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
-            			client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            			client.println(".button2 {background-color: #77878A;}</style></head>");
+						//client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");          
+						//client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
+            			//client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
+            			//client.println(".button2 {background-color: #77878A;}</style>");
+						//client.println("</head>");
 
             			client.println("<body>");
 
-						if (header.indexOf("connect?") >= 0)
+						if (header.indexOf("form") >= 0)
 						{
-							client.println("<p>cmd=disconnect</p>");
+							if(header.indexOf("rightleg=") >= 0)
+							{
+								int index[] = {	header.indexOf("rightleg="),
+												header.indexOf("leftleg="),
+												header.indexOf("HTTP/1.1"),
+											};
+
+								nodeData[eID_RULEG][eDATA_ROL] = header.substring(index[0] + 9, index[1] - 1);
+								nodeData[eID_LULEG][eDATA_ROL] = header.substring(index[1] + 8, index[2] - 1);
+
+								owasLegsCheck();
+							}
+
+							client.println("<form action='form'>");
+
+							client.println("<label for='rightleg'>Right Leg :</label><br>");
+							client.println("<input type='text' id='rightleg' name='rightleg' value='");
+							client.println(nodeData[eID_RULEG][eDATA_ROL]);
+							client.println("'><br>");
+
+							client.println("<label for='leftleg'>Left Leg :</label><br>");
+							client.println("<input type='text' id='left_leg' name='leftleg' value='");
+							client.println(nodeData[eID_LULEG][eDATA_ROL]);
+							client.println("'><br><br>");
+							client.println("<input type='submit' value='Submit'>");
+
+							client.println("</form>");
+						}
+						else if (header.indexOf("connect?") >= 0)
+						{
+							if(!bDebugState) 
+							{
+								client.println("<p>cmd=disconnect</p>");
+							}
+							else
+							{
+								client.println("<p>cmd=wait</p>");
+							}
 
 							int index[] = {	header.indexOf("nod="),
 											header.indexOf("HTTP/1.1"),
 										};
 
 							int nodeId = header.substring(index[0] + 4, index[1] - 1).toInt();
+							
+							Serial.println();
+							Serial.println("------------------------");
 							Serial.print("Node: ");
 							Serial.print(nodeId);
-							Serial.println("  Conected !");
+							Serial.println("  Connected !");
+
+							nodeTimeGapCheck(nodeId);
+
+							//delaytime = queueGetDelayTime(nodeId);
+							//client.println("<br/><p>delay=20 seconds</p>");
 						}
 						else if (header.indexOf("update?") >= 0)
 						{
 							if(!bDebugState) 
 							{
-								client.println("<p>cmd=disconnect</p>");
+								client.println("<p>cmd=ok</p>");
 							}
 							else
 							{
@@ -256,31 +646,36 @@ void clientCheck(WiFiClient client)
 							
 							int nodeId = header.substring(index[0] + 4, index[1] - 1).toInt();
 
-							nodeData[nodeId][DATA_ID] = String((nodeId + 1), DEC);
-							nodeData[nodeId][DATA_ROL] = header.substring(index[1] + 4, index[2] - 1);
-							nodeData[nodeId][DATA_PIT] = header.substring(index[2] + 4, index[3] - 1);
-							nodeData[nodeId][DATA_YAW] = header.substring(index[3] + 4, index[4] - 1);
-							nodeData[nodeId][DATA_MVR] = header.substring(index[4] + 4, index[5] - 1);
-							nodeData[nodeId][DATA_MVP] = header.substring(index[5] + 4, index[6] - 1);
-							nodeData[nodeId][DATA_BAT] = header.substring(index[6] + 4, index[7] - 1);
-							nodeData[nodeId][DATA_END] = "0";
+							nodeData[nodeId][eDATA_ID]	= String((nodeId + 1), DEC);
+							nodeData[nodeId][eDATA_ROL] = header.substring(index[1] + 4, index[2] - 1);
+							nodeData[nodeId][eDATA_PIT] = header.substring(index[2] + 4, index[3] - 1);
+							nodeData[nodeId][eDATA_YAW] = header.substring(index[3] + 4, index[4] - 1);
+							nodeData[nodeId][eDATA_MVR] = header.substring(index[4] + 4, index[5] - 1);
+							nodeData[nodeId][eDATA_MVP] = header.substring(index[5] + 4, index[6] - 1);
+							nodeData[nodeId][eDATA_BAT] = header.substring(index[6] + 4, index[7] - 1);
 							
-							// Serial.println();
+							Serial.println();
+							Serial.println("------------------------");
 							Serial.print("Node = ");
-							Serial.println(nodeId);
-							// Serial.print("Roll = ");
-							// Serial.println(nodeData[nodeId][DATA_ROL]);
-							// Serial.print("Pitch = ");
-							// Serial.println(nodeData[nodeId][DATA_PIT]);
-							// Serial.print("Yaw = ");
-							// Serial.println(nodeData[nodeId][DATA_YAW]);
-							// Serial.print("Roll Movement = ");
-							// Serial.println(nodeData[nodeId][DATA_MVR]);
-							// Serial.print("Pitch Movement = ");
-							// Serial.println(nodeData[nodeId][DATA_MVP]);
-							// Serial.print("Batt = ");
-							// Serial.println(nodeData[nodeId][DATA_BAT]);
-							// Serial.println("------------------------");
+							Serial.print(nodeId);
+							Serial.println("  --> Data received !");
+							//Serial.print("Roll = ");
+							//Serial.println(nodeData[nodeId][eDATA_ROL]);
+							//Serial.print("Pitch = ");
+							//Serial.println(nodeData[nodeId][eDATA_PIT]);
+							//Serial.print("Yaw = ");
+							//Serial.println(nodeData[nodeId][eDATA_YAW]);
+							//Serial.print("Roll Movement = ");
+							//Serial.println(nodeData[nodeId][eDATA_MVR]);
+							//Serial.print("Pitch Movement = ");
+							//Serial.println(nodeData[nodeId][eDATA_MVP]);
+							//Serial.print("Batt = ");
+							//Serial.println(nodeData[nodeId][eDATA_BAT]);
+
+							//delaytime = queueGetDelayTime(nodeId);
+							//client.print("<br/><p>delay=40 seconds</p>");
+							
+							nodeTimeGapCheck(nodeId);
 
 							nodeFlagSet(nodeId);
 						}
@@ -331,254 +726,18 @@ void clientCheck(WiFiClient client)
 		client.stop();
 		// Serial.println("Client disconnected.");
 		// Serial.println("");
+
+		digitalWrite(LED_BUILTIN, LOW);
 	}
 }
-
-byte owasBackCheck()
-{
-	byte bBackRoll	= abs(nodeData[ID_BACK][DATA_ROL].toInt());
-	byte bBackPitch	= abs(nodeData[ID_BACK][DATA_PIT].toInt());
-	byte bRetVal = 1;
-
-	if(bBackRoll > nLimitBackRoll)
-	{
-		bRetVal = 2;
-	}
-
-	if(bBackPitch > nLimitBackPitch)
-	{
-		bRetVal = 3;
-	}
-
-	if((bBackRoll > nLimitBackRoll)
-		 && (bBackPitch > nLimitBackPitch))
-	{
-		bRetVal = 4;
-	}
-
-	return bRetVal;
-}
-
-byte owasArmsCheck()
-{
-	byte bLeftArmRoll	= abs(nodeData[ID_LARM][DATA_ROL].toInt());
-	byte bLeftArmPitch	= abs(nodeData[ID_LARM][DATA_PIT].toInt());
-	byte bRightArmRoll	= abs(nodeData[ID_RARM][DATA_ROL].toInt());
-	byte bRightArmPitch	= abs(nodeData[ID_RARM][DATA_PIT].toInt());
-	byte bRetVal = 1;
-
-	if((bRightArmRoll > nLimitArms) || (bRightArmPitch > nLimitArms))
-	{
-		bRetVal++;
-	}
-
-	if((bLeftArmRoll > nLimitArms) || (bLeftArmPitch > nLimitArms))
-	{
-		bRetVal++;
-	}
-
-	return bRetVal;
-}
-
-bool compareInRange(int value, int limit1, int limit2)
-{
-	bool bRetVal = false;
-
-	if((limit1 <= value ) && (value < limit2))
-	{
-		bRetVal = true;
-	}
-
-	return bRetVal;
-}
-
-int nLimitLegStand	= 0;
-int nLimitLegBent	= 30;
-int nLimitLegSit	= 60;
-int nLimitLegSquat	= 120;
-int nLimitDegMax	= 180;
-int nLimitWalking	= 800;
-
-byte owasLegsCheck()
-{
-	byte bRightUpperLeg	= abs(nodeData[ID_RULEG][DATA_ROL].toInt());
-	// byte bRightLowerLeg	= abs(nodeData[ID_RLLEG][DATA_ROL].toInt());
-	byte bLeftUpperLeg	= abs(nodeData[ID_LULEG][DATA_ROL].toInt());
-	// byte bLeftLowerLeg	= abs(nodeData[ID_LLLEG][DATA_ROL].toInt());
-	byte bRightMoveR	= abs(nodeData[ID_LLLEG][DATA_MVR].toInt());
-	byte bRightMoveP	= abs(nodeData[ID_LLLEG][DATA_MVP].toInt());
-	byte bLeftMoveR		= abs(nodeData[ID_LLLEG][DATA_MVR].toInt());
-	byte bLeftMoveP		= abs(nodeData[ID_LLLEG][DATA_MVP].toInt());
-	byte bRetVal = 1;
-
-
-	/*-- Moving or Walking --*/
-	if((bRightMoveR > nLimitWalking || bRightMoveP > nLimitWalking)
-		&& (bLeftMoveR > nLimitWalking || bLeftMoveP > nLimitWalking))
-	{
-		bRetVal = 7;
-	}
-
-	/*-- Standing with one leg --*/
-	else if((compareInRange(bRightUpperLeg, nLimitLegStand, nLimitLegBent)
-				&& compareInRange(bLeftUpperLeg, nLimitLegBent, nLimitDegMax))
-					|| ((compareInRange(bRightUpperLeg, nLimitLegBent, nLimitDegMax)
-						&& compareInRange(bLeftUpperLeg, nLimitLegStand, nLimitLegBent))))
-	{
-		bRetVal = 3;
-	}
-
-	/*-- Stand --*/
-	else if(compareInRange(bRightUpperLeg, nLimitLegStand, nLimitLegBent)
-			&& compareInRange(bLeftUpperLeg, nLimitLegStand, nLimitLegBent))
-	{
-		bRetVal = 2;
-	}
-	
-	/*-- Standing with both legs bent --*/
-	else if((compareInRange(bRightUpperLeg, nLimitLegBent, nLimitLegSit)
-				&& compareInRange(bLeftUpperLeg, nLimitLegBent, nLimitLegSit)))
-	{
-		bRetVal = 4;
-	}
-
-	/*-- Standing with one leg bent --*/
-	else if((compareInRange(bRightUpperLeg, nLimitLegBent, nLimitLegSit)
-			&& compareInRange(bLeftUpperLeg, nLimitLegSit, nLimitLegSquat))
-				|| ((compareInRange(bRightUpperLeg, nLimitLegSit, nLimitLegSquat)
-					&& compareInRange(bLeftUpperLeg, nLimitLegBent, nLimitLegSit))))
-	{
-		bRetVal = 5;
-	}
-
-	/*-- Sit --*/
-	else if((compareInRange(bRightUpperLeg, nLimitLegSit, nLimitLegSquat)
-			&& compareInRange(bLeftUpperLeg, nLimitLegSit, nLimitLegSquat)))
-	{
-		bRetVal = 1;
-	}
-
-	/*-- Squatting --*/
-	else if((compareInRange(bRightUpperLeg, nLimitLegSquat, nLimitDegMax)
-			&& compareInRange(bLeftUpperLeg, nLimitLegSquat, nLimitDegMax)))
-	{
-		bRetVal = 6;
-	}
-
-	/*-- Default: Sitting --*/
-	else
-	{
-		bRetVal = 1;
-	}
-
-	return bRetVal;
-}
-
-byte owasLoadCheck()
-{
-	byte bRetVal = 1;
-
-	if(nUserLoad >= nLimitLoad1 && nUserLoad < nLimitLoad2)
-	{
-		bRetVal = 2;
-	}
-	else if(nUserLoad >= nLimitLoad2)
-	{
-		bRetVal = 3;
-	}
-
-	return bRetVal;
-}
-
-void owasJudgement()
-{
-	byte bOwasLeg	= owasLegsCheck();
-	byte bOwasLoad	= owasLoadCheck();
-	byte bOwasBack	= owasBackCheck();
-	byte bOwasArms	= owasArmsCheck();
-
-	byte bColumn	= ((bOwasLeg - 1) * 3) + bOwasLoad;
-	byte bRow		= ((bOwasBack - 1) * 3) + bOwasArms;
-	byte bOwasValue	= bOwasTable[bRow - 1][bColumn - 1];
-	
-	nodeData[ID_OWAS][OWAS_ID]		= "1";
-	nodeData[ID_OWAS][OWAS_BACK]	= String(bOwasBack,		DEC);
-	nodeData[ID_OWAS][OWAS_ARMS]	= String(bOwasArms,		DEC);
-	nodeData[ID_OWAS][OWAS_LEGS]	= String(bOwasLeg,		DEC);
-	nodeData[ID_OWAS][OWAS_LOAD]	= String(bOwasLoad,		DEC);
-	nodeData[ID_OWAS][OWAS_LEVEL]	= String(bOwasValue,	DEC);
-}
-
-/*
-void unitTest_Leg()
-{
-	int patternsize = 5;
-	int pattern[] = {nLimitLegStand, nLimitLegBent - 2, nLimitLegSit - 2, nLimitLegSquat - 2, nLimitLegSquat + 2};
-
-
-	Serial.println();
-	Serial.println();
-	Serial.println("Right Leg ----------------------------------");
-
-	for(int i = 0; i < patternsize; i++)
-	{
-		nodeData[ID_RULEG][DATA_ROL] = String(pattern[i], DEC);
-		nodeData[ID_LULEG][DATA_ROL] = String(35, DEC);
-
-		Serial.print("RL : ");
-		Serial.print(nodeData[ID_RULEG][DATA_ROL]);
-		Serial.print("  | LL : ");
-		Serial.print(nodeData[ID_LULEG][DATA_ROL]);
-		Serial.print(" | OWAS : ");
-		Serial.println(owasLegsCheck());
-		Serial.println("----------------------------------");
-		Serial.println();
-	}
-
-	
-	Serial.println();
-	Serial.println();
-	Serial.println("Left Leg ----------------------------------");
-
-	for(int i = 0; i < patternsize; i++)
-	{
-		nodeData[ID_RULEG][DATA_ROL] = String(35, DEC);
-		nodeData[ID_LULEG][DATA_ROL] = String(pattern[i], DEC);
-
-		Serial.print("RL : ");
-		Serial.print(nodeData[ID_RULEG][DATA_ROL]);
-		Serial.print(" | LL : ");
-		Serial.print(nodeData[ID_LULEG][DATA_ROL]);
-		Serial.print(" | OWAS : ");
-		Serial.println(owasLegsCheck());
-		Serial.println("----------------------------------");
-	}
-
-	Serial.println();
-	Serial.println();
-	Serial.println("Both Leg ----------------------------------");
-
-	for(int i = 0; i < patternsize; i++)
-	{
-		nodeData[ID_RULEG][DATA_ROL] = String(pattern[i], DEC);
-		nodeData[ID_LULEG][DATA_ROL] = String(pattern[i], DEC);
-
-		Serial.print("RL Roll : ");
-		Serial.print(nodeData[ID_RULEG][DATA_ROL]);
-		Serial.print(" | LL Roll : ");
-		Serial.print(nodeData[ID_LULEG][DATA_ROL]);
-		Serial.print(" | OWAS : ");
-		Serial.println(owasLegsCheck());
-		Serial.println("----------------------------------");
-	}
-}
-*/
 
 void setup()
 {
 	Serial.begin(115200);
 
 	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(PIN_BUZZER, OUTPUT);
+	pinMode(PIN_VIBRATOR, OUTPUT);
 
 	WiFi.mode(WIFI_AP);
 	delay(2000);
@@ -626,37 +785,81 @@ void setup()
 	pServer->getAdvertising()->start();
 	Serial.println("Waiting a client connection to notify...");
 
+	sNodeData.reserve(200);
+
 	nodeFlagReset();
+	limitSettingInit();
 }
 
 void loop() 
 {
 	int i = 0;
-	String sNodeData;
-	char txString[20] = "";
+	char txString[60] = "";
+
+	sNodeData = "";
 
 	// Listen for incoming clients
 	clientCheck(server.available());
 
 	if( nodeFlagCheck() == true)
 	{
-		owasJudgement();
+		if(owasJudgement() == 4)
+		{
+			digitalWrite(PIN_BUZZER, HIGH);
+			digitalWrite(PIN_VIBRATOR, HIGH);
+			digitalWrite(LED_BUILTIN, HIGH);
+
+			bWarningFlag = true;
+
+			ulWarningMillis = millis();
+		}
+		else
+		{
+			digitalWrite(PIN_BUZZER, HIGH);
+			delay(50);
+			digitalWrite(PIN_BUZZER, LOW);
+		}	
+
 		nodeFlagReset();
 
+		bInitialFlag = false;
 		bDataReadyFlag = true;
+	}
+
+	if(bWarningFlag)
+	{	
+		if((millis() - ulWarningMillis) > ulWarningDelay)
+		{
+			digitalWrite(PIN_BUZZER, LOW);
+			digitalWrite(PIN_VIBRATOR, LOW);
+			digitalWrite(LED_BUILTIN, LOW);
+		
+			bWarningFlag = false;
+		}
 	}
 	
 	if(bDataReadyFlag && bleDeviceConnected)
 	{
 		if((millis() - ulMillis) > ulNodeDelay)
 		{
-			sNodeData =	nodeData[nodeIndex][0] + "," +
-						nodeData[nodeIndex][1] + "," +
-						nodeData[nodeIndex][2] + "," +
-						nodeData[nodeIndex][3] + "," +
-						nodeData[nodeIndex][4] + "," +
-						nodeData[nodeIndex][5] + "\0" ;
-				
+			if(nodeIndex == 0)
+			{
+				sNodeData =	String(nodeIndex + 1, DEC) + "," +
+								nodeData[nodeIndex][eOWAS_BACK] + "," +
+								nodeData[nodeIndex][eOWAS_ARMS] + "," +
+								nodeData[nodeIndex][eOWAS_LEGS] + "," +
+								nodeData[nodeIndex][eOWAS_LOAD] + "," +
+								nodeData[nodeIndex][eOWAS_LEVEL] + "\0" ;
+			}
+			else
+			{
+				sNodeData =	String(nodeIndex + 1, DEC) + "," +
+								nodeData[nodeIndex][eDATA_ROL] + "," +
+								nodeData[nodeIndex][eDATA_PIT] + "," +
+								nodeData[nodeIndex][eDATA_YAW] + "," +
+								nodeData[nodeIndex][eDATA_BAT] + "\0" ;
+			}
+
 			i = 0;
 			do
 			{
@@ -674,7 +877,7 @@ void loop()
 			Serial.println(txString);
 		
 			nodeIndex++;
-			if(nodeIndex > ID_END - 1)
+			if(nodeIndex == eID_SIZE)
 			{
 				nodeIndex = 0;
 				bDataReadyFlag = false;

@@ -21,16 +21,19 @@
 #define VIN_MAX		    6
 #define ADC_RESO	    1023
 
-#define WIFI_TIMEOUT    3000
-#define RETRY_TIMEOUT   20
+#define WIFI_TIMEOUT    5000
+#define RETRY_TIMEOUT   10
 
 #define CMD_NONE		"cmd=none"
+#define CMD_OK		    "cmd=ok"
 #define CMD_WAIT		"cmd=wait"
 #define CMD_CALIBRATE   "cmd=calibrate"
 #define CMD_RESTART     "cmd=restart"
 #define CMD_DISCONNECT  "cmd=disconnect"
 
-#define TICK_TIMEOUT	2500
+#define TICK_DEFAULT	1500
+#define TICK_RETRY  	200
+#define TICK_WAIT   	4000
 
 #define SUBSTRACTOR		1
 

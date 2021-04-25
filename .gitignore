@@ -123,3 +123,5 @@ app.*.symbols
 # Hardware
 *.stl
 *.FCStd1
+
+*.elf

@@ -50,6 +50,7 @@ bool	sensor_checkConnection();
 
 void	    wifi_init();
 void	    wifi_connect();
+void        wifi_reconnect();
 void	    wifi_disconnect();
 void	    wifi_checkUpdateRequest();
 eNODESTATE	wifi_getStatus();
