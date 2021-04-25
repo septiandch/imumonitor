@@ -111,7 +111,7 @@ class PostController {
           callback(convert.jsonDecode(response.body)['status']);
         }
       });
-    } catch (e) {
+    } on FormatException catch (e) {
       print(e);
     }
   }

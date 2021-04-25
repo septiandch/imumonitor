@@ -26,7 +26,9 @@ class _HomeScreenState extends State<HomeScreen>
   String _pageName;
   bool _btState;
   bool _updateFlag;
+  int _bleupdatecount;
   Timer _timer;
+  Timer _bletimer;
   DateTime _now;
 
   @override
@@ -38,11 +40,15 @@ class _HomeScreenState extends State<HomeScreen>
     _pageName = pageList[0];
     _controller.addListener(_handleSelected);
     _btState = false;
+    _bleupdatecount = 0;
+    _bletimer =
+        Timer.periodic(Duration(seconds: 60), (Timer t) => _reconnect());
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    _bletimer.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -104,42 +110,45 @@ class _HomeScreenState extends State<HomeScreen>
     _now = DateTime.now();
     List<String> value = intToString(rawValue).split(',');
 
-    ImuContainer.of(context).updateCurrentData(
-        int.parse(value[0]),
-        (value[0] == '1')
-            ? "${value[1]},${value[2]},${value[3]},${value[4]},${value[5]}"
-            : "${value[1]},${value[2]},${value[3]}");
+    //debugPrint(value.toString());
 
-    setState(() {
-      ImuContainer.of(context).updateSeriesData(
-        int.parse(value[0]),
-        _now.hour.toString() +
-            ":" +
-            _now.minute.toString() +
-            ":" +
-            _now.second.toString(),
-        <int>[
-          int.parse(value[1]),
-          int.parse(value[2]),
-          int.parse(value[3]),
-          if (value[0] == '1') int.parse(value[4]),
-          if (value[0] == '1') int.parse(value[5]),
-        ],
-      );
-    });
+    if (value[0] != '0') {
+      ImuContainer.of(context).updateCurrentData(
+          int.parse(value[0]),
+          (value[0] == '1')
+              ? "${value[1]},${value[2]},${value[3]},${value[4]},${value[5]}"
+              : "${value[1]},${value[2]},${value[3]},${value[4]}");
 
-    // do post request after data receiving is completed
-    if (_updateFlag && (value[0] == '8')) {
-      _submitData();
-
-      _updateFlag = false;
+      setState(() {
+        ImuContainer.of(context).updateSeriesData(
+          int.parse(value[0]),
+          _now.hour.toString() +
+              ":" +
+              _now.minute.toString() +
+              ":" +
+              _now.second.toString(),
+          <int>[
+            int.parse(value[1]),
+            int.parse(value[2]),
+            int.parse(value[3]),
+            int.parse(value[4]),
+            if (value[0] == '1') int.parse(value[5]),
+          ],
+        );
+      });
     }
 
-    // Wait for all data received
-    if (ImuContainer.of(context)
-        .currentData
-        .every((element) => element != null)) {
+    // First data received
+    if (value[0] == '1' && !_updateFlag) {
       _updateFlag = true;
+    }
+
+    // Do post request after data receiving is completed
+    if (value[0] == '8' && _updateFlag) {
+      _submitData();
+
+      _bleupdatecount++;
+      _updateFlag = false;
     }
   }
 
@@ -160,6 +169,29 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     _startConnection();
+  }
+
+  void _reconnect() async {
+    if (_bleupdatecount == 0 && _btState == true) {
+      if (_selectedDevice.device != null) {
+        try {
+          await _selectedDevice.device.connect();
+        } catch (e) {
+          if (e.code != 'already_connected') {
+            throw e;
+          }
+        } finally {
+          _selectedDevice.services =
+              await _selectedDevice.device.discoverServices();
+        }
+      }
+
+      _timer = Timer(Duration(seconds: 5), () {
+        _getDeviceData();
+      });
+    }
+
+    _bleupdatecount = 0;
   }
 
   void _startConnection() async {

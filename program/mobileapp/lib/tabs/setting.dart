@@ -8,27 +8,23 @@ import '../config/colorscheme.dart';
 class SettingParam {
   final String name;
   final int initval;
-  final int range;
   final int min;
   final int max;
 
-  SettingParam(
-    this.name,
-    this.initval,
-    this.range,
-  )   : min = initval - range,
-        max = initval + range;
+  SettingParam(this.name, this.initval, this.min, this.max);
 }
 
 List<SettingParam> settingList = [
-  SettingParam("Back Bent", 30, 15),
-  SettingParam("Back Twist", 30, 15),
-  SettingParam("Shoulder Level", 90, 20),
-  SettingParam("Sit Range", 90, 20),
-  SettingParam("Standing Range", 0, 15),
-  SettingParam("Squatting Range", 110, 30),
-  SettingParam("Kneeling Range", 90, 30),
-  SettingParam("Walking Range", 20, 15),
+  SettingParam("Shoulder Level", 90, 70, 110),
+  SettingParam("Back Bent", 20, 15, 30),
+  SettingParam("Back Twist", 20, 15, 30),
+  SettingParam("Load 1", 10, 5, 15),
+  SettingParam("Load 2", 20, 16, 30),
+  SettingParam("Stand", 0, 0, 10),
+  SettingParam("Bent", 20, 11, 30),
+  SettingParam("Sit", 90, 70, 100),
+  SettingParam("Squatting", 120, 101, 130),
+  SettingParam("Moving Sens.", 110, 99, 999),
 ];
 
 class SettingTab extends StatefulWidget {
@@ -49,6 +45,9 @@ class _SettingTabState extends State<SettingTab> {
 
   Widget _valuePicker(String title, int min, int max, BuildContext context) {
     int index = settingList.indexWhere((element) => element.name == title);
+
+    if (_currentValue[index] > max) _currentValue[index] = max;
+    if (_currentValue[index] < min) _currentValue[index] = min;
 
     return GestureDetector(
       onLongPress: () {
@@ -226,7 +225,7 @@ class _SettingTabState extends State<SettingTab> {
               ),
               // _button("Test", Icons.add, _openBottomSheet),
               _button("Simpan", Icons.save, _toSavedScreen),
-              _button("Ganti User", Icons.person, _toRegistrationScreen),
+              _button("User Data", Icons.person, _toRegistrationScreen),
             ],
           ),
         ),

@@ -30,7 +30,7 @@ class Monitor extends StatefulWidget {
 class _MonitorState extends State<Monitor> {
   Widget _valueContainer(String title, double value, Color decorationColor) {
     return Container(
-      width: 75.0,
+      width: 72.0,
       padding: EdgeInsets.fromLTRB(8, 1, 5, 1),
       decoration: BoxDecoration(
         border: Border(
@@ -42,7 +42,6 @@ class _MonitorState extends State<Monitor> {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +55,7 @@ class _MonitorState extends State<Monitor> {
                 ),
               ),
               SizedBox(
-                width: 10,
+                width: 5,
               ),
               Text(
                 value.toInt().toString(),
@@ -69,7 +68,7 @@ class _MonitorState extends State<Monitor> {
             ],
           ),
           SizedBox(
-            width: 10,
+            width: 5,
           ),
         ],
       ),
@@ -103,7 +102,7 @@ class _MonitorState extends State<Monitor> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.85,
+      width: MediaQuery.of(context).size.width * 0.8,
       margin: EdgeInsets.only(bottom: 20.0),
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -122,24 +121,24 @@ class _MonitorState extends State<Monitor> {
         onTap: () {
           _settingModalBottomSheet(context, widget.title, widget.data);
         },
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            if (widget.title != "")
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: kTextColor,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            SizedBox(
+              height: 12,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                if (widget.title != "")
-                  Container(
-                    width: 90,
-                    child: Text(
-                      widget.title,
-                      style: TextStyle(
-                        color: kTextColor,
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 SizedBox(
                   width: 2,
                 ),
@@ -162,6 +161,11 @@ class _MonitorState extends State<Monitor> {
                         widget.data.multiSeriesData[2].seriesData.last.value,
                         kSeriesColors[2],
                       ),
+                      _valueContainer(
+                        "Batt",
+                        widget.data.multiSeriesData[3].seriesData.last.value,
+                        kSeriesColors[3],
+                      ),
                     ],
                   ),
                 ),
@@ -173,25 +177,3 @@ class _MonitorState extends State<Monitor> {
     );
   }
 }
-
-/*
-class LineChart extends StatefulWidget {
-  final String title;
-  final MultiSeriesData chartData;
-
-  LineChart(
-    this.title,
-    this.chartData,
-  );
-
-  @override
-  _LineChartState createState() => _LineChartState();
-}
-
-class _LineChartState extends State<LineChart> {
-  @override
-  Widget build(BuildContext context) {
-    
-  }
-}
-*/

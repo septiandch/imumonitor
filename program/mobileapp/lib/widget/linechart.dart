@@ -89,21 +89,22 @@ class _LineChartState extends State<LineChart> {
             ),
             series: <CartesianSeries>[
               for (var i = 0; i < widget.chartData.multiSeriesData.length; i++)
-                SplineSeries<SingleData, String>(
-                  name: widget.chartData.multiSeriesData[i].seriesName,
-                  // Bind data source
-                  dataSource: widget.chartData.multiSeriesData[i].seriesData,
-                  xValueMapper: (SingleData value, _) => value.time,
-                  yValueMapper: (SingleData value, _) => value.value,
-                  color: kSeriesColors[i],
-                  /*
+                if (widget.chartData.multiSeriesData[i].seriesName != "Batt")
+                  SplineSeries<SingleData, String>(
+                    name: widget.chartData.multiSeriesData[i].seriesName,
+                    // Bind data source
+                    dataSource: widget.chartData.multiSeriesData[i].seriesData,
+                    xValueMapper: (SingleData value, _) => value.time,
+                    yValueMapper: (SingleData value, _) => value.value,
+                    color: kSeriesColors[i],
+                    /*
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [kSeriesColors[i], kSeriesColors2[i]],
                     ),
                     */
-                ),
+                  ),
             ],
           ),
         ),
@@ -115,22 +116,23 @@ class _LineChartState extends State<LineChart> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               for (var i = 0; i < widget.chartData.multiSeriesData.length; i++)
-                Row(
-                  children: <Widget>[
-                    Icon(Icons.stop, color: kSeriesColors[i]),
-                    Text(
-                      widget.chartData.multiSeriesData[i].seriesName,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: kTextColor,
-                        fontSize: 15.0,
+                if (widget.chartData.multiSeriesData[i].seriesName != "Batt")
+                  Row(
+                    children: <Widget>[
+                      Icon(Icons.stop, color: kSeriesColors[i]),
+                      Text(
+                        widget.chartData.multiSeriesData[i].seriesName,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: kTextColor,
+                          fontSize: 15.0,
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                    ],
+                  ),
             ],
           ),
         ),

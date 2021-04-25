@@ -6,18 +6,19 @@ import '../widget/imucontainer.dart';
 
 const List<String> sensorList = [
   "Lower Back",
-  "Upper Right Hand",
-  "Upper Left Hand",
-  "Lower Right Hand",
-  "Lower Left Hand",
-  "Right Leg",
-  "Left Leg",
+  "Right Arm",
+  "Left Arm",
+  "Right Upper Leg",
+  "Right Lower Leg",
+  "Left Upper Leg",
+  "Left Lower Leg",
 ];
 
 MultiSeriesData dummyData = MultiSeriesData(<SeriesData>[
   SeriesData('Roll', <SingleData>[SingleData('', 0)]),
   SeriesData('Pitch', <SingleData>[SingleData('', 0)]),
   SeriesData('Yaw', <SingleData>[SingleData('', 0)]),
+  SeriesData('Batt', <SingleData>[SingleData('', 0)]),
 ]);
 
 class SensorTab extends StatefulWidget {

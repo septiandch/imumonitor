@@ -82,7 +82,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     height: 40,
                   ),
                   Text(
-                    "Masukkan\nData Diri Anda",
+                    "Masukkan\nData User",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: kTextColor,

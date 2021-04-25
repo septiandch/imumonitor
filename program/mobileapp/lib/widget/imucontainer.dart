@@ -4,7 +4,7 @@ import '../tabs/setting.dart';
 import '../widget/linechart.dart';
 
 const List<String> owasTitle = ["Back", "Arms", "Legs", "Load"];
-const List<String> imuTitle = ["Roll", "Pitch", "Yaw"];
+const List<String> imuTitle = ["Roll", "Pitch", "Yaw", "Battery"];
 
 class User {
   String name;
@@ -45,8 +45,11 @@ class ImuContainer extends StatefulWidget {
 class _ImuContainerState extends State<ImuContainer> {
   User user = User();
   List<int> owasDataBase = List<int>();
-  List<int> settingValue = List<int>.generate(settingList.length,
-      (index) => (index == settingList.length - 1) ? 10 : 180);
+  List<int> settingValue = List<int>.generate(
+      settingList.length,
+      (index) => (index == settingList.length - 1)
+          ? settingList[index].initval
+          : (settingList[index].max / 2).ceil());
   List<String> currentData = List<String>(8);
 
   List<MultiSeriesData> imuDataBase = List<MultiSeriesData>.generate(
@@ -65,6 +68,7 @@ class _ImuContainerState extends State<ImuContainer> {
               SeriesData("Roll", List<SingleData>()),
               SeriesData("Pitch", List<SingleData>()),
               SeriesData("Yaw", List<SingleData>()),
+              SeriesData("Batt", List<SingleData>()),
             ],
           ),
   );
@@ -78,7 +82,7 @@ class _ImuContainerState extends State<ImuContainer> {
 
   clearData() {
     owasDataBase = List<int>();
-
+    currentData = List<String>(8);
     imuDataBase = List<MultiSeriesData>.generate(
       8,
       (index) => (index == 0)
@@ -95,6 +99,7 @@ class _ImuContainerState extends State<ImuContainer> {
                 SeriesData("Roll", List<SingleData>()),
                 SeriesData("Pitch", List<SingleData>()),
                 SeriesData("Yaw", List<SingleData>()),
+                SeriesData("Batt", List<SingleData>()),
               ],
             ),
     );
@@ -165,7 +170,7 @@ class _ImuContainerState extends State<ImuContainer> {
     final key = 'current_setting';
     prefs.setString(key, text);
 
-    print('saved $text');
+    debugPrint('saved $text');
   }
 
   void updateCurrentData(int index, String data) {
@@ -185,6 +190,9 @@ class _ImuContainerState extends State<ImuContainer> {
               .seriesData
               .add(SingleData(time, value[i].toDouble()));
     }
+
+    debugPrint(
+        index.toString() + " - " + time.toString() + " - " + value.toString());
   }
 
   @override

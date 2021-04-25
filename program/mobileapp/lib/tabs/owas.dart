@@ -119,11 +119,9 @@ class _OwasTabState extends State<OwasTab> {
         _selectedDateIndex--;
       }
 
-      setState(() {
-        (_selectedDateIndex == 0)
-            ? _selectedDateTitle = 'Hari ini'
-            : _selectedDateTitle = _reverseDateList[_selectedDateIndex];
-      });
+      (_selectedDateIndex == 0)
+          ? _selectedDateTitle = 'Hari ini'
+          : _selectedDateTitle = _reverseDateList[_selectedDateIndex];
 
       await _getData(_reverseDateList[_selectedDateIndex]);
     }
@@ -161,13 +159,39 @@ class _OwasTabState extends State<OwasTab> {
                 values[5 + (j * 3)],
                 values[6 + (j * 3)],
                 values[7 + (j * 3)],
+                0,
               ],
             );
           }
         }
+      } else {
+        ImuContainer.of(context).updateSeriesData(
+          1,
+          "",
+          <int>[
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        );
 
-        setState(() {});
+        for (var j = 0; j < 7; j++) {
+          ImuContainer.of(context).updateSeriesData(
+            (j + 2),
+            "",
+            <int>[
+              0,
+              0,
+              0,
+              0,
+            ],
+          );
+        }
       }
+
+      setState(() {});
     }
   }
 
