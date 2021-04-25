@@ -82,7 +82,7 @@ int wifi_getStatus()
 					nBatt = gpio_battCheck();
 					bBattPercentage = volt2percentage(nBatt);
 
-					//command = webserver_postRequest();
+					//command = webserver_getRequest();
 				}
 
 				if(bConnCount > 6)

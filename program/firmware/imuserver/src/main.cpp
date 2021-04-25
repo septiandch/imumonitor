@@ -205,6 +205,7 @@ bool bleDeviceConnected = false;
 
 int nUserLoad = 5;
 String nodeData[eID_SIZE][eDATA_SIZE];
+String nodeDataArray[eID_SIZE][3 * 10];
 
 void limitSettingInit()
 {
@@ -524,6 +525,7 @@ void clientCheck(WiFiClient client)
 {
 	String header = "";
 	int delaytime = 0;
+	bool bUpdateFlag = false;
 
 	if (client.available())											// If a new client connects,
 	{
@@ -633,32 +635,20 @@ void clientCheck(WiFiClient client)
 								client.println("<p>cmd=wait</p>");
 							}
 
-							// Process client get request
+							bUpdateFlag = true;
+							
 							int index[] = {	header.indexOf("nod="),
-											header.indexOf("rol="),
-											header.indexOf("pit="),
-											header.indexOf("yaw="),
-											header.indexOf("mro="),
-											header.indexOf("mpi="),
-											header.indexOf("bat="),
-											header.indexOf("HTTP/1.1"),
+											header.indexOf("rol=")
 										};
-							
-							int nodeId = header.substring(index[0] + 4, index[1] - 1).toInt();
 
-							nodeData[nodeId][eDATA_ID]	= String((nodeId + 1), DEC);
-							nodeData[nodeId][eDATA_ROL] = header.substring(index[1] + 4, index[2] - 1);
-							nodeData[nodeId][eDATA_PIT] = header.substring(index[2] + 4, index[3] - 1);
-							nodeData[nodeId][eDATA_YAW] = header.substring(index[3] + 4, index[4] - 1);
-							nodeData[nodeId][eDATA_MVR] = header.substring(index[4] + 4, index[5] - 1);
-							nodeData[nodeId][eDATA_MVP] = header.substring(index[5] + 4, index[6] - 1);
-							nodeData[nodeId][eDATA_BAT] = header.substring(index[6] + 4, index[7] - 1);
-							
+							int nodeId = header.substring(index[0] + 4, index[1] - 1).toInt();
+			
 							Serial.println();
 							Serial.println("------------------------");
 							Serial.print("Node = ");
 							Serial.print(nodeId);
 							Serial.println("  --> Data received !");
+							
 							//Serial.print("Roll = ");
 							//Serial.println(nodeData[nodeId][eDATA_ROL]);
 							//Serial.print("Pitch = ");
@@ -679,13 +669,13 @@ void clientCheck(WiFiClient client)
 
 							nodeFlagSet(nodeId);
 						}
-						else
+						else if (header.indexOf("debug") >= 0)
 						{
-							if (header.indexOf("GET /state/on") >= 0)
+							if (header.indexOf("GET /debug/state/on") >= 0)
 							{
 								bDebugState = true;
 							}
-							else if (header.indexOf("GET /state/off") >= 0)
+							else if (header.indexOf("GET /debug/state/off") >= 0)
 							{
 								bDebugState = false;
 							}
@@ -693,12 +683,37 @@ void clientCheck(WiFiClient client)
 							if(bDebugState)
 							{								
 								client.println("<p>Debug State : ON</p>");
-								client.println("<p><a href=\"/state/off\"><button class=\"button\">Turn OFF</button></a></p>");
+								client.println("<p><a href=\"/debug/state/off\"><button class=\"button\">Turn OFF</button></a></p>");
 							}
 							else
 							{
 								client.println("<p>Debug State : OFF</p>");
-								client.println("<p><a href=\"/state/on\"><button class=\"button button2\">Turn ON</button></a></p>");
+								client.println("<p><a href=\"/debug/state/on\"><button class=\"button button2\">Turn ON</button></a></p>");
+							}
+						}
+						else
+						{
+							int i, j;
+							for(i = 0; i < 7; i++)
+							{
+								client.println("<h2>Sensor " + String((i + 1), DEC) + " Table</h2>");
+								client.println("<table border='1' cellpadding='8'>");
+								client.println("<tr><th>No.</th><th>Roll</th><th>Pitch</th><th>Yaw</th></tr>");
+
+								for(j = 0; j < 30; j+=3)
+								{
+									client.println("<tr>");
+
+									client.println("<td>" + String((((j / 3) + 1) * 5), DEC) + "</td>");
+									client.println("<td>" + nodeDataArray[i][j + 0] + "</td>");
+									client.println("<td>" + nodeDataArray[i][j + 1] + "</td>");
+									client.println("<td>" + nodeDataArray[i][j + 2] + "</td>");
+
+									client.println("</tr>");
+								}
+
+								client.println("</table>");
+								client.println("<br/><br/>");
 							}
 						}
 
@@ -726,6 +741,128 @@ void clientCheck(WiFiClient client)
 		client.stop();
 		// Serial.println("Client disconnected.");
 		// Serial.println("");
+
+		if(bUpdateFlag)
+		{
+			// Process client get request
+			int index[] = {	header.indexOf("nod="),
+							header.indexOf("rol="),
+							header.indexOf("pit="),
+							header.indexOf("yaw="),
+							header.indexOf("mro="),
+							header.indexOf("mpi="),
+							header.indexOf("bat="),
+
+							header.indexOf("rol0="),
+							header.indexOf("pit0="),
+							header.indexOf("yaw0="),
+
+							header.indexOf("rol1="),
+							header.indexOf("pit1="),
+							header.indexOf("yaw1="),
+
+							header.indexOf("rol2="),
+							header.indexOf("pit2="),
+							header.indexOf("yaw2="),
+
+							header.indexOf("rol3="),
+							header.indexOf("pit3="),
+							header.indexOf("yaw3="),
+
+							header.indexOf("rol4="),
+							header.indexOf("pit4="),
+							header.indexOf("yaw4="),
+
+							header.indexOf("rol5="),
+							header.indexOf("pit5="),
+							header.indexOf("yaw5="),
+
+							header.indexOf("rol6="),
+							header.indexOf("pit6="),
+							header.indexOf("yaw6="),
+
+							header.indexOf("rol7="),
+							header.indexOf("pit7="),
+							header.indexOf("yaw7="),
+
+							header.indexOf("rol8="),
+							header.indexOf("pit8="),
+							header.indexOf("yaw8="),
+
+							header.indexOf("rol9="),
+							header.indexOf("pit9="),
+							header.indexOf("yaw9="),
+
+							header.indexOf("HTTP/1.1"),
+						};
+						
+			int nodeId = header.substring(index[0] + 4, index[1] - 1).toInt();
+
+			nodeData[nodeId][eDATA_ID]	= String((nodeId + 1), DEC);
+			nodeData[nodeId][eDATA_ROL] = header.substring(index[1] + 4, index[2] - 1);
+			nodeData[nodeId][eDATA_PIT] = header.substring(index[2] + 4, index[3] - 1);
+			nodeData[nodeId][eDATA_YAW] = header.substring(index[3] + 4, index[4] - 1);
+			nodeData[nodeId][eDATA_MVR] = header.substring(index[4] + 4, index[5] - 1);
+			nodeData[nodeId][eDATA_MVP] = header.substring(index[5] + 4, index[6] - 1);
+			nodeData[nodeId][eDATA_BAT] = header.substring(index[6] + 4, index[7] - 1);
+
+			if(index[7] > 0)
+			{
+				nodeId -= 1;
+
+				nodeDataArray[nodeId][0]  = header.substring(index[7] + 5, index[8] - 1);
+				nodeDataArray[nodeId][1]  = header.substring(index[8] + 5, index[9] - 1);
+				nodeDataArray[nodeId][2]  = header.substring(index[9] + 5, index[10] - 1);
+
+				nodeDataArray[nodeId][3]  = header.substring(index[10] + 5, index[11] - 1);
+				nodeDataArray[nodeId][4]  = header.substring(index[11] + 5, index[12] - 1);
+				nodeDataArray[nodeId][5]  = header.substring(index[12] + 5, index[13] - 1);
+
+				nodeDataArray[nodeId][6]  = header.substring(index[13] + 5, index[14] - 1);
+				nodeDataArray[nodeId][7]  = header.substring(index[14] + 5, index[15] - 1);
+				nodeDataArray[nodeId][8]  = header.substring(index[15] + 5, index[16] - 1);
+
+				nodeDataArray[nodeId][9]  = header.substring(index[16] + 5, index[17] - 1);
+				nodeDataArray[nodeId][10] = header.substring(index[17] + 5, index[18] - 1);
+				nodeDataArray[nodeId][11] = header.substring(index[18] + 5, index[19] - 1);
+
+				nodeDataArray[nodeId][12] = header.substring(index[19] + 5, index[20] - 1);
+				nodeDataArray[nodeId][13] = header.substring(index[20] + 5, index[21] - 1);
+				nodeDataArray[nodeId][14] = header.substring(index[21] + 5, index[22] - 1);
+
+				nodeDataArray[nodeId][15] = header.substring(index[22] + 5, index[23] - 1);
+				nodeDataArray[nodeId][16] = header.substring(index[23] + 5, index[24] - 1);
+				nodeDataArray[nodeId][17] = header.substring(index[24] + 5, index[25] - 1);
+
+				nodeDataArray[nodeId][18] = header.substring(index[25] + 5, index[26] - 1);
+				nodeDataArray[nodeId][19] = header.substring(index[26] + 5, index[27] - 1);
+				nodeDataArray[nodeId][20] = header.substring(index[27] + 5, index[28] - 1);
+
+				nodeDataArray[nodeId][21] = header.substring(index[28] + 5, index[29] - 1);
+				nodeDataArray[nodeId][22] = header.substring(index[29] + 5, index[30] - 1);
+				nodeDataArray[nodeId][23] = header.substring(index[30] + 5, index[31] - 1);
+
+				nodeDataArray[nodeId][24] = header.substring(index[31] + 5, index[32] - 1);
+				nodeDataArray[nodeId][25] = header.substring(index[32] + 5, index[33] - 1);
+				nodeDataArray[nodeId][26] = header.substring(index[33] + 5, index[34] - 1);
+
+				nodeDataArray[nodeId][27] = header.substring(index[34] + 5, index[35] - 1);
+				nodeDataArray[nodeId][28] = header.substring(index[35] + 5, index[36] - 1);
+				nodeDataArray[nodeId][29] = header.substring(index[36] + 5, index[37] - 1);
+
+				//Serial.println("\n\n------------------------------------");
+				//int x;
+				//for(x = 0; x < 30; x+=3)
+				//{
+				//	Serial.println("Rol" + String(x ,DEC) + "= " + nodeDataArray[nodeId][x + 0]);
+				//	Serial.println("Pit" + String(x ,DEC) + "= " + nodeDataArray[nodeId][x + 1]);
+				//	Serial.println("Yaw" + String(x ,DEC) + "= " + nodeDataArray[nodeId][x + 2]);
+				//
+				//	Serial.println();
+				//}
+				//Serial.println("------------------------------------\n\n");
+			}
+		}
 
 		digitalWrite(LED_BUILTIN, LOW);
 	}

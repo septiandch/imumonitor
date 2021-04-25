@@ -31,9 +31,9 @@
 #define CMD_RESTART     "cmd=restart"
 #define CMD_DISCONNECT  "cmd=disconnect"
 
-#define TICK_DEFAULT	1500
+#define TICK_DEFAULT	1000
 #define TICK_RETRY  	200
-#define TICK_WAIT   	4000
+#define TICK_WAIT   	2000
 
 #define SUBSTRACTOR		1
 

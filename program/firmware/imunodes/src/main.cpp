@@ -3,6 +3,8 @@
 void mainEventCheck();
 void substract(long *dwVal, int substractor);
 void commandCheck(String cmd);
+void dataArrayAppend(int roll, int pitch, int yaw);
+void dataArrayClear();
 
 long dwTickMainCounter = 0;
 
@@ -26,6 +28,16 @@ int nRoll		= 0;
 int nYaw		= 0;
 long dwRollMov 	= 0; 
 long dwPitchMov	= 0;
+
+// Rotation Value Data Array
+const byte MAX_DATA = 10;
+byte nDataCount = 0;
+int nPitchData[MAX_DATA];
+int nRollData[MAX_DATA];
+int nYawData[MAX_DATA];
+String strDataArray;
+const unsigned long SAMPLING_TIME = 5000;
+unsigned long dwSamplingTimer;
 
 void setup()
 {
@@ -57,7 +69,7 @@ void loop()
 			}
 			else
 			{	
-				commandCheck(webserver_postRequest(NODEID, nRoll, nPitch, nYaw, dwRollMov, dwPitchMov, bBatt));
+				commandCheck(webserver_getRequest(NODEID, nRoll, nPitch, nYaw, dwRollMov, dwPitchMov, bBatt, strDataArray));
 			}
 			
 			bTickFlag = false;
@@ -87,6 +99,12 @@ void loop()
 	}	
 	
 	sensor_getData(&nRoll, &nPitch, &nYaw, &dwRollMov, &dwPitchMov);
+	
+	if(millis() - dwSamplingTimer > SAMPLING_TIME && !bInitFlag)
+	{
+		dataArrayAppend(nRoll, nPitch, nYaw);
+		dwSamplingTimer = millis();
+	}
 
 	timer_update();
 	delay(1);
@@ -119,6 +137,8 @@ void commandCheck(String cmd)
 		bRetryCount = 0;
 
 		nTickLimit = TICK_WAIT;
+
+		dataArrayClear();
 		wifi_disconnect();
 	}
     else if(cmd.indexOf(CMD_WAIT) > 0 )
@@ -168,6 +188,37 @@ void commandCheck(String cmd)
 						};
 		nTickLimit = (cmd.substring(index[0] + 6, index[1] - 1).toInt()) * 100;
 	}
+}
+
+void dataArrayAppend(int roll, int pitch, int yaw)
+{
+	if(nDataCount < MAX_DATA)
+	{
+		nRollData[nDataCount] = roll;
+		nPitchData[nDataCount] = pitch;
+		nYawData[nDataCount] = yaw;
+
+		strDataArray += "&rol" + String(nDataCount ,DEC) + "=" + String(roll, DEC) + 
+						"&pit" + String(nDataCount ,DEC) + "=" + String(pitch, DEC) +
+						"&yaw" + String(nDataCount ,DEC) + "=" + String(yaw, DEC);
+
+		nDataCount ++;
+	}
+}
+
+void dataArrayClear()
+{
+	byte i;
+
+	for(i = 0; i < MAX_DATA; i++)
+	{
+		nRollData[nDataCount] = 0;
+		nPitchData[nDataCount] = 0;
+		nYawData[nDataCount] = 0;
+	}
+
+	strDataArray = "";
+	nDataCount = 0;
 }
 
 void substract(long *dwVal, int substractor)
