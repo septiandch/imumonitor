@@ -40,12 +40,16 @@ void wifi_connect()
 
 void wifi_reconnect()
 {
+#	if 0
 	WiFi.reconnect();
+#	endif
 }
 
 void wifi_disconnect()
 {
+#	if 0
 	WiFi.disconnect();
+#	endif
 }
 
 /*

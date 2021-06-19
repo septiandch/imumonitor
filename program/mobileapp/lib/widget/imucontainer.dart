@@ -46,10 +46,7 @@ class _ImuContainerState extends State<ImuContainer> {
   User user = User();
   List<int> owasDataBase = List<int>();
   List<int> settingValue = List<int>.generate(
-      settingList.length,
-      (index) => (index == settingList.length - 1)
-          ? settingList[index].initval
-          : (settingList[index].max / 2).ceil());
+      settingList.length, (index) => settingList[index].initval);
   List<String> currentData = List<String>(8);
 
   List<MultiSeriesData> imuDataBase = List<MultiSeriesData>.generate(
