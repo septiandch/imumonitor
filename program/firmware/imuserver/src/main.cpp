@@ -537,7 +537,7 @@ void clientCheck(WiFiClient client)
 			if (client.available())
 			{
 				char c = client.read();
-				//Serial.write(c);
+				Serial.write(c);
 				header += c;
 
 				if (c == '\n') 
@@ -698,7 +698,7 @@ void clientCheck(WiFiClient client)
 							{
 								client.println("<h2>Sensor " + String((i + 1), DEC) + " Table</h2>");
 								client.println("<table border='1' cellpadding='8'>");
-								client.println("<tr><th>No.</th><th>Roll</th><th>Pitch</th><th>Yaw</th></tr>");
+								client.println("<tr><th>Sec.</th><th>Roll</th><th>Pitch</th><th>Yaw</th></tr>");
 
 								for(j = 0; j < 30; j+=3)
 								{

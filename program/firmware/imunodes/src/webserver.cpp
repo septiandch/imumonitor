@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
 #include "prototypes.h"
 #include "definitions.h"
 #include "variables.h"
+
+#define USE_JSON
 
 WiFiServer server(80);
 
@@ -34,6 +37,23 @@ void webserver_commandCheck(String cmd)
 	{
 		wifi_disconnect();
 	}
+}
+
+void webserver_createJsonDoc(WiFiClient &client)
+{
+	StaticJsonDocument<200> doc;
+
+	doc["id"] = NODEID;
+	doc["batt"] = bBatt;
+
+	JsonArray data = doc.createNestedArray("data");
+	data.add(nRoll);
+	data.add(nPitch);
+	data.add(nYaw);
+	data.add(dwRollMov);
+	data.add(dwPitchMov);
+
+	serializeJsonPretty(doc, client);
 }
 
 void  webserver_checkClientRequest()
@@ -70,10 +90,16 @@ void  webserver_checkClientRequest()
 						// HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
 						// and a content-type so the client knows what's coming, then a blank line:
 						client.println("HTTP/1.1 200 OK");
+					#	if defined(USE_JSON)
+						client.println("Content-Type: application/json");
+					#	else
 						client.println("Content-type:text/html");
-						client.println("Connection: close");
+					#	endif
 						client.println();
 						
+					#	if defined(USE_JSON)
+						webserver_createJsonDoc(client);
+					#else
 						// Display the HTML web page
 						client.println("<!DOCTYPE html><html>");
 						client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -81,6 +107,7 @@ void  webserver_checkClientRequest()
 						
 						// Web Page Heading
 						client.println("<body>");
+
 						client.println("<h1>Node :");
 					#	ifdef NODEID
 						client.println(NODEID);
@@ -116,6 +143,7 @@ void  webserver_checkClientRequest()
 						client.println("<p>Pitch Diff : "	+ String(dwPitchMov, DEC)	+ "</p>");
 						
 						client.println("</body></html>");
+					#	endif
 						
 						// The HTTP response ends with another blank line
 						client.println();
