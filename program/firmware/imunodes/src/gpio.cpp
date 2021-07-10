@@ -12,11 +12,20 @@ eNODESTATE eLedMode = eNODE_DISCONNECTED;
 
 void gpio_pinInit()
 {
+#ifdef ESP32_DEF
+	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(PIN_BUZZER, OUTPUT);
+	pinMode(PIN_VIBRATOR, OUTPUT);
+
+	digitalWrite(PIN_BUZZER, LOW);
+	digitalWrite(PIN_VIBRATOR, LOW);
+#else
 	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(BAT_EN, OUTPUT);
 
-	digitalWrite(LED_BUILTIN, HIGH);
+	digitalWrite(LED_BUILTIN, LOW);
 	digitalWrite(BAT_EN, LOW);
+#endif
 
 	gpio_i2cInit();
 }
@@ -25,12 +34,16 @@ int gpio_battCheck()
 {
 	int value = 0;
 
+#ifdef ESP32_DEF
+	// ...do nothing
+#else
 	digitalWrite(BAT_EN, HIGH);
 	delay(100);
 
 	value = (int)(((float)(analogRead(BAT_CH) * VIN_MAX) / ADC_RESO) * 100);
 
 	digitalWrite(BAT_EN, LOW);
+#endif
 
 	return value;
 }
@@ -47,6 +60,16 @@ void gpio_i2cInit()
 
 void gpio_led(byte state)
 {
+#ifdef ESP32_DEF
+	if(state == LOW)
+	{
+		digitalWrite(LED_BUILTIN, LOW);
+	}
+	else
+	{
+		digitalWrite(LED_BUILTIN, HIGH);
+	}
+#else
 	if(state == LOW)
 	{
 		digitalWrite(LED_BUILTIN, HIGH);
@@ -55,6 +78,7 @@ void gpio_led(byte state)
 	{
 		digitalWrite(LED_BUILTIN, LOW);
 	}
+#endif
 }
 
 void gpio_ledBlink(eNODESTATE mode)

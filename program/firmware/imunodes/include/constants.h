@@ -7,7 +7,7 @@
 const char WIFI_NAME[] = WIFINAME;
 const char WIFI_PW[] = WIFIPASS;
 #else
-const char WIFI_NAME[] = "ESP32 BLE";
+const char WIFI_NAME[] = "IMU_Net";
 const char WIFI_PW[] = "12345678";
 #endif
 

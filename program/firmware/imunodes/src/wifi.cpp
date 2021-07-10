@@ -1,8 +1,12 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#ifdef ESP32_DEF
+#	include <WiFi.h>
+#else
+#	include <ESP8266WiFi.h>
+#	include "EasyOta.h"
+#endif
 #include "definitions.h"
 #include "prototypes.h"
-#include "EasyOta.h"
 
 IPAddress IP(DEFAULT_IP);
 IPAddress NETMASK(DEFAULT_NETMSK);
@@ -15,18 +19,15 @@ void wifi_init()
 
 	webserver_init();
 
+#ifndef ESP32_DEF
 	EasyOta.setup();
+#endif
 }
 
 void wifi_connect()
 {
 	WiFi.mode(WIFI_STA);
-	WiFi.setSleepMode(WIFI_NONE_SLEEP);
-	WiFi.begin(WIFI_NAME, WIFI_PW);
-
-	WiFi.waitForConnectResult(WIFI_TIMEOUT);
-
-	delay(1000);
+	// WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
 #	ifndef IPADDR
   	WiFi.config(IP, NETWORK, NETMASK, DNS);
@@ -36,6 +37,20 @@ void wifi_connect()
 	str2ip(IP_ADDR, ip);
 	WiFi.config(IPAddress(ip[0], ip[1], ip[2], ip[3]), NETWORK, NETMASK, DNS);
 #	endif
+
+	delay(1000);
+
+	WiFi.begin(WIFI_NAME, WIFI_PW);
+
+#ifdef ESP32_DEF
+	while (WiFi.status() != WL_CONNECTED)
+	{
+		delay(500);
+		Serial.print(".");
+	}
+#else
+	WiFi.waitForConnectResult(WIFI_TIMEOUT);
+#endif
 }
 
 void wifi_reconnect()
@@ -173,5 +188,7 @@ eNODESTATE wifi_getStatus()
 
 void wifi_checkUpdateRequest()
 {
+#ifndef ESP32_DEF
 	EasyOta.checkForUpload();
+#endif
 }
