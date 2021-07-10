@@ -2,6 +2,11 @@
 #define PROTOTYPES_H
 
 #include <Arduino.h>
+#ifdef ESP32_DEF
+#	include <WiFi.h>
+#else
+#   include <ESP8266HTTPClient.h>
+#endif
 #include "constants.h"
 
 /*---------------------------------------*/
@@ -11,6 +16,7 @@
 void	str2ip(const char ipstr[], int ipaddr[]);
 int		volt2percentage(int vBatt);
 String	i2cScan();
+void    jsonDocPrint(WiFiClient &client);
 
 
 /*---------------------------------------*/
