@@ -125,3 +125,23 @@ app.*.symbols
 *.FCStd1
 
 *.elf
+
+*.compiled
+
+*.o
+
+*.ppu
+
+*.res
+
+*.csv
+
+program/desktopapp/conf.ini
+
+*.or
+
+program/desktopapp/imumonitor
+
+program/desktopapp/backup/
+
+program/desktopapp/lib/x86_64-linux/

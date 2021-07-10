@@ -1,0 +1,1015 @@
+object Form1: TForm1
+  Left = 287
+  Height = 544
+  Top = 228
+  Width = 1032
+  Caption = 'OWAS Level Monitoring'
+  ClientHeight = 544
+  ClientWidth = 1032
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  Position = poScreenCenter
+  LCLVersion = '2.0.6.0'
+  object Label1: TLabel
+    Left = 16
+    Height = 31
+    Top = 16
+    Width = 356
+    Caption = 'OWAS Level Monitoring'
+    Font.Height = -27
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 15
+    Top = 200
+    Width = 110
+    Caption = 'Load File CSV :'
+    Font.Height = -13
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 15
+    Top = 72
+    Width = 45
+    Caption = 'Date :'
+    Font.Height = -13
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label10: TLabel
+    Left = 16
+    Height = 23
+    Top = 96
+    Width = 138
+    Caption = '21-06-2021'
+    Font.Height = -21
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object PageControl1: TPageControl
+    Left = 192
+    Height = 451
+    Top = 80
+    Width = 816
+    ActivePage = TabSheet4
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabIndex = 3
+    TabOrder = 0
+    object TabSheet1: TTabSheet
+      Caption = 'OWAS Level'
+      ClientHeight = 420
+      ClientWidth = 806
+      object Label4: TLabel
+        Left = 682
+        Height = 15
+        Top = 388
+        Width = 30
+        Anchors = [akRight, akBottom]
+        Caption = 'Legs'
+        ParentColor = False
+      end
+      object Label5: TLabel
+        Left = 761
+        Height = 15
+        Top = 388
+        Width = 33
+        Anchors = [akRight, akBottom]
+        Caption = 'Load'
+        ParentColor = False
+      end
+      object Label6: TLabel
+        Left = 601
+        Height = 15
+        Top = 388
+        Width = 36
+        Anchors = [akRight, akBottom]
+        Caption = 'Arms'
+        ParentColor = False
+      end
+      object Label7: TLabel
+        Left = 529
+        Height = 15
+        Top = 388
+        Width = 32
+        Anchors = [akRight, akBottom]
+        Caption = 'Back'
+        ParentColor = False
+      end
+      object Shape1: TShape
+        Left = 505
+        Height = 16
+        Top = 388
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clBlue
+      end
+      object Shape2: TShape
+        Left = 577
+        Height = 16
+        Top = 388
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clYellow
+      end
+      object Shape3: TShape
+        Left = 657
+        Height = 16
+        Top = 388
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clRed
+      end
+      object Shape4: TShape
+        Left = 737
+        Height = 16
+        Top = 388
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clLime
+      end
+      object Label8: TLabel
+        Left = 16
+        Height = 21
+        Top = 24
+        Width = 191
+        Caption = 'OWAS Category : '
+        Font.Height = -19
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object Label9: TLabel
+        Left = 208
+        Height = 21
+        Top = 24
+        Width = 29
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = '0'
+        Font.Height = -19
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object Chart_Owas: TChart
+        Left = 16
+        Height = 300
+        Top = 72
+        Width = 778
+        AxisList = <        
+          item
+            Marks.LabelBrush.Style = bsClear
+            Minors = <>
+            Title.LabelFont.Orientation = 900
+            Title.Caption = 'Degree Value'
+            Title.LabelBrush.Style = bsClear
+          end        
+          item
+            Alignment = calBottom
+            Marks.LabelBrush.Style = bsClear
+            Minors = <>
+            Title.Caption = 'Time (Second)'
+            Title.LabelBrush.Style = bsClear
+          end>
+        Foot.Brush.Color = clBtnFace
+        Foot.Font.Color = clBlue
+        Proportional = True
+        Title.Brush.Color = clBtnFace
+        Title.Font.Color = clBlue
+        Title.Text.Strings = (
+          'TAChart'
+        )
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        object LineSeries_Back: TLineSeries
+          LinePen.Color = clBlue
+          LinePen.Width = 3
+        end
+        object LineSeries_Arms: TLineSeries
+          LinePen.Color = clYellow
+          LinePen.Width = 3
+        end
+        object LineSeries_Legs: TLineSeries
+          LinePen.Color = clRed
+          LinePen.Width = 3
+        end
+        object LineSeries_Load: TLineSeries
+          LinePen.Color = clLime
+          LinePen.Width = 3
+        end
+        object LineSeries_Owas: TLineSeries
+          LinePen.Style = psDash
+          LinePen.Width = 3
+        end
+      end
+      object Label15: TLabel
+        Left = 450
+        Height = 15
+        Top = 389
+        Width = 42
+        Anchors = [akRight, akBottom]
+        Caption = 'OWAS'
+        ParentColor = False
+      end
+      object Shape8: TShape
+        Left = 426
+        Height = 16
+        Top = 389
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clBlack
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Sensor Monitor'
+      ClientHeight = 420
+      ClientWidth = 806
+      object Chart_Sensors: TChart
+        Left = 16
+        Height = 305
+        Top = 72
+        Width = 770
+        AxisList = <        
+          item
+            Marks.LabelBrush.Style = bsClear
+            Minors = <>
+            Title.LabelFont.Orientation = 900
+            Title.Caption = 'Degree Value'
+            Title.LabelBrush.Style = bsClear
+          end        
+          item
+            Alignment = calBottom
+            Marks.LabelBrush.Style = bsClear
+            Minors = <>
+            Title.Caption = 'Time (Second)'
+            Title.LabelBrush.Style = bsClear
+          end>
+        Foot.Brush.Color = clBtnFace
+        Foot.Font.Color = clBlue
+        Title.Brush.Color = clBtnFace
+        Title.Font.Color = clBlue
+        Title.Text.Strings = (
+          'TAChart'
+        )
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        object LineSeries_Roll1: TLineSeries
+          LinePen.Color = clBlue
+          LinePen.Width = 3
+        end
+        object LineSeries_Pitch1: TLineSeries
+          LinePen.Color = clYellow
+          LinePen.Width = 3
+        end
+        object LineSeries_Yaw1: TLineSeries
+          LinePen.Color = clRed
+          LinePen.Width = 3
+        end
+        object LineSeries_Roll2: TLineSeries
+          LinePen.Color = clBlue
+        end
+        object LineSeries_Pitch2: TLineSeries
+        end
+        object LineSeries_Yaw2: TLineSeries
+        end
+        object LineSeries_Roll3: TLineSeries
+          LinePen.Color = clBlue
+        end
+        object LineSeries_Pitch3: TLineSeries
+        end
+        object LineSeries_Yaw3: TLineSeries
+        end
+        object LineSeries_Roll4: TLineSeries
+        end
+        object LineSeries_Pitch4: TLineSeries
+        end
+        object LineSeries_Yaw4: TLineSeries
+        end
+        object LineSeries_Roll5: TLineSeries
+        end
+        object LineSeries_Pitch5: TLineSeries
+        end
+        object LineSeries_Yaw5: TLineSeries
+        end
+        object LineSeries_Roll6: TLineSeries
+          LinePen.Color = clBlue
+          LinePen.Width = 3
+        end
+        object LineSeries_Pitch6: TLineSeries
+        end
+        object LineSeries_Yaw6: TLineSeries
+        end
+        object LineSeries_Roll7: TLineSeries
+        end
+        object LineSeries_Pitch7: TLineSeries
+        end
+        object LineSeries_Yaw7: TLineSeries
+        end
+      end
+      object Shape5: TShape
+        Left = 584
+        Height = 16
+        Top = 393
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clBlue
+      end
+      object Label11: TLabel
+        Left = 608
+        Height = 15
+        Top = 393
+        Width = 26
+        Anchors = [akRight, akBottom]
+        Caption = 'Roll'
+        ParentColor = False
+      end
+      object Shape6: TShape
+        Left = 656
+        Height = 16
+        Top = 393
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clYellow
+      end
+      object Label12: TLabel
+        Left = 680
+        Height = 15
+        Top = 393
+        Width = 34
+        Anchors = [akRight, akBottom]
+        Caption = 'Pitch'
+        ParentColor = False
+      end
+      object Shape7: TShape
+        Left = 736
+        Height = 16
+        Top = 393
+        Width = 17
+        Anchors = [akRight, akBottom]
+        Brush.Color = clRed
+      end
+      object Label13: TLabel
+        Left = 760
+        Height = 15
+        Top = 393
+        Width = 26
+        Anchors = [akRight, akBottom]
+        Caption = 'Yaw'
+        ParentColor = False
+      end
+      object ComboBox_Sensor: TComboBox
+        Left = 168
+        Height = 28
+        Top = 24
+        Width = 184
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          '1. Lower Back'
+          '2. Right Arm'
+          '3. Left Arm'
+          '4. Right Upper Leg'
+          '5. Right Lower Leg'
+          '6. Left Upper Leg'
+          '7. Left Lower Leg'
+        )
+        OnChange = ComboBox_SensorChange
+        TabOrder = 1
+        Text = '1. Lower Back'
+      end
+      object Label14: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 24
+        Width = 143
+        AutoSize = False
+        Caption = 'Sensor Select : '
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'Setting'
+      ClientHeight = 420
+      ClientWidth = 806
+      object Label16: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 112
+        Width = 184
+        AutoSize = False
+        Caption = 'Back Bent Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_BackBent: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 144
+        Width = 184
+        Max = 30
+        Min = 15
+        Position = 15
+        TabOrder = 0
+      end
+      object Label17: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 200
+        Width = 184
+        AutoSize = False
+        Caption = 'Back Twist Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_BackTwist: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 232
+        Width = 184
+        Max = 30
+        Min = 15
+        Position = 15
+        TabOrder = 1
+      end
+      object Label18: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 416
+        Height = 25
+        Top = 24
+        Width = 184
+        AutoSize = False
+        Caption = 'Load 1 Limit :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_Load1: TTrackBar
+        Left = 416
+        Height = 38
+        Top = 56
+        Width = 184
+        Max = 15
+        Min = 5
+        Position = 5
+        TabOrder = 2
+      end
+      object Label19: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 216
+        Height = 25
+        Top = 24
+        Width = 184
+        AutoSize = False
+        Caption = 'Standing Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_LegStand: TTrackBar
+        Left = 216
+        Height = 38
+        Top = 56
+        Width = 184
+        Position = 0
+        TabOrder = 3
+      end
+      object Label20: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 216
+        Height = 25
+        Top = 112
+        Width = 184
+        AutoSize = False
+        Caption = 'Bent Leg Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_LegBent: TTrackBar
+        Left = 216
+        Height = 38
+        Top = 144
+        Width = 184
+        Max = 30
+        Min = 11
+        Position = 11
+        TabOrder = 4
+      end
+      object Label21: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 216
+        Height = 25
+        Top = 200
+        Width = 184
+        AutoSize = False
+        Caption = 'Sitting Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_LegSit: TTrackBar
+        Left = 216
+        Height = 38
+        Top = 232
+        Width = 184
+        Max = 100
+        Min = 70
+        Position = 70
+        TabOrder = 5
+      end
+      object Label22: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 416
+        Height = 25
+        Top = 112
+        Width = 184
+        AutoSize = False
+        Caption = 'Load 2 Limit :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_Load2: TTrackBar
+        Left = 416
+        Height = 38
+        Top = 144
+        Width = 184
+        Max = 30
+        Min = 16
+        Position = 16
+        TabOrder = 6
+      end
+      object Label23: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 216
+        Height = 25
+        Top = 288
+        Width = 184
+        AutoSize = False
+        Caption = 'Squatting Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object TrackBar_LegSquat: TTrackBar
+        Left = 216
+        Height = 38
+        Top = 320
+        Width = 184
+        Max = 130
+        Min = 101
+        Position = 101
+        TabOrder = 7
+      end
+      object TrackBar_MoveSens: TTrackBar
+        Left = 616
+        Height = 38
+        Top = 56
+        Width = 184
+        Frequency = 10
+        Max = 5000
+        Min = 1000
+        Position = 1000
+        TabOrder = 8
+      end
+      object Label25: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 616
+        Height = 25
+        Top = 24
+        Width = 184
+        AutoSize = False
+        Caption = 'Move Sensitivity :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object Button4: TButton
+        Left = 632
+        Height = 40
+        Top = 368
+        Width = 152
+        Caption = 'Save'
+        TabOrder = 9
+        Visible = False
+      end
+      object Button5: TButton
+        Left = 464
+        Height = 40
+        Top = 368
+        Width = 152
+        Caption = 'Reset'
+        TabOrder = 10
+        Visible = False
+      end
+      object TrackBar_Shoulder: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 56
+        Width = 184
+        Max = 110
+        Min = 80
+        Position = 80
+        TabOrder = 11
+      end
+      object Label24: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 24
+        Width = 184
+        AutoSize = False
+        Caption = 'Shoulder Level :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+    end
+    object TabSheet4: TTabSheet
+      Caption = 'User Data'
+      ClientHeight = 420
+      ClientWidth = 806
+      object Edit_Nama: TEdit
+        Left = 16
+        Height = 28
+        Top = 56
+        Width = 216
+        TabOrder = 0
+      end
+      object Edit_Usia: TEdit
+        Left = 16
+        Height = 28
+        Top = 136
+        Width = 216
+        TabOrder = 1
+      end
+      object Label26: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 24
+        Width = 216
+        AutoSize = False
+        Caption = 'Nama :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object Label27: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 104
+        Width = 216
+        AutoSize = False
+        Caption = 'Usia (Tahun) : '
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object Label28: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 184
+        Width = 216
+        AutoSize = False
+        Caption = 'Tinggi badan (cm) : '
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object Edit_Tinggi: TEdit
+        Left = 16
+        Height = 28
+        Top = 216
+        Width = 216
+        TabOrder = 2
+      end
+      object Label29: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 16
+        Height = 25
+        Top = 264
+        Width = 216
+        AutoSize = False
+        Caption = 'Berat Beban (Kg) : '
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+      object Edit_Berat: TEdit
+        Left = 16
+        Height = 28
+        Top = 296
+        Width = 216
+        TabOrder = 3
+      end
+      object Edit_Kegiatan: TEdit
+        Left = 264
+        Height = 28
+        Top = 56
+        Width = 216
+        TabOrder = 4
+      end
+      object Label31: TLabel
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Side = asrCenter
+        Left = 264
+        Height = 25
+        Top = 24
+        Width = 216
+        AutoSize = False
+        Caption = 'Kegiatan :'
+        Font.Height = -16
+        Font.Name = 'Sans'
+        Font.Style = [fsBold]
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
+      end
+    end
+    object TabSheet5: TTabSheet
+      Caption = 'Test'
+      ClientHeight = 420
+      ClientWidth = 806
+      TabVisible = False
+      object Button1: TButton
+        Left = 16
+        Height = 25
+        Top = 248
+        Width = 75
+        Caption = 'Button1'
+        OnClick = Button1Click
+        TabOrder = 0
+      end
+      object TrackBar1: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 16
+        Width = 248
+        Max = 180
+        Min = 1
+        Position = 1
+        TabOrder = 1
+      end
+      object TrackBar2: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 72
+        Width = 248
+        Max = 180
+        Min = 1
+        Position = 1
+        TabOrder = 2
+      end
+      object TrackBar3: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 128
+        Width = 248
+        Max = 180
+        Min = 1
+        Position = 1
+        TabOrder = 3
+      end
+      object TrackBar4: TTrackBar
+        Left = 16
+        Height = 38
+        Top = 192
+        Width = 248
+        Max = 180
+        Min = 1
+        Position = 1
+        TabOrder = 4
+      end
+      object TrackBar5: TTrackBar
+        Left = 296
+        Height = 38
+        Top = 16
+        Width = 248
+        Max = 5000
+        Min = 1000
+        Position = 1000
+        TabOrder = 5
+      end
+      object TrackBar6: TTrackBar
+        Left = 296
+        Height = 38
+        Top = 72
+        Width = 248
+        Max = 5000
+        Min = 1000
+        Position = 1000
+        TabOrder = 6
+      end
+      object TrackBar7: TTrackBar
+        Left = 296
+        Height = 38
+        Top = 128
+        Width = 248
+        Max = 5000
+        Min = 1000
+        Position = 1000
+        TabOrder = 7
+      end
+      object TrackBar8: TTrackBar
+        Left = 296
+        Height = 38
+        Top = 184
+        Width = 248
+        Max = 5000
+        Min = 1000
+        Position = 1000
+        TabOrder = 8
+      end
+      object Button2: TButton
+        Left = 176
+        Height = 25
+        Top = 248
+        Width = 75
+        Caption = 'Button2'
+        OnClick = Button2Click
+        TabOrder = 9
+      end
+      object Memo1: TMemo
+        Left = 584
+        Height = 90
+        Top = 32
+        Width = 160
+        TabOrder = 10
+      end
+      object Memo2: TMemo
+        Left = 584
+        Height = 82
+        Top = 160
+        Width = 160
+        TabOrder = 11
+      end
+      object Button7: TButton
+        Left = 669
+        Height = 25
+        Top = 248
+        Width = 75
+        Caption = 'Button7'
+        OnClick = Button7Click
+        TabOrder = 12
+      end
+      object Button6: TButton
+        Left = 584
+        Height = 25
+        Top = 248
+        Width = 75
+        Caption = 'Button6'
+        OnClick = Button6Click
+        TabOrder = 13
+      end
+      object Edit1: TEdit
+        Left = 584
+        Height = 28
+        Top = 128
+        Width = 160
+        TabOrder = 14
+      end
+      object Button8: TButton
+        Left = 584
+        Height = 25
+        Top = 312
+        Width = 75
+        Caption = 'Button8'
+        OnClick = Button8Click
+        TabOrder = 15
+      end
+      object Button9: TButton
+        Left = 669
+        Height = 25
+        Top = 312
+        Width = 75
+        Caption = 'Button9'
+        OnClick = Button9Click
+        TabOrder = 16
+      end
+      object Label30: TLabel
+        Left = 105
+        Height = 15
+        Top = 336
+        Width = 53
+        Caption = 'Label30'
+        Font.Color = 2057727
+        ParentColor = False
+        ParentFont = False
+      end
+    end
+  end
+  object Button3: TButton
+    Left = 16
+    Height = 40
+    Top = 136
+    Width = 160
+    Caption = 'Start Monitoring'
+    OnClick = Button3Click
+    TabOrder = 1
+  end
+  object FileNameEdit: TFileNameEdit
+    Left = 16
+    Height = 28
+    Top = 224
+    Width = 160
+    FileName = 'Choose file...'
+    OnAcceptFileName = FileNameEditAcceptFileName
+    Filter = 'CSV|*.csv'
+    FilterIndex = 0
+    HideDirectories = False
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    TabOrder = 2
+    Text = 'Choose file...'
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 7000
+    OnTimer = TimerTimer
+    left = 24
+    top = 280
+  end
+end
