@@ -48,6 +48,9 @@
 #define BAT_EN		    D6		//GPIO12
 #define BAT_CH		    A0		//ADC
 
+/* ESP32 */
+#define PIN_BUZZER		12
+#define PIN_VIBRATOR	13
 
 /*---------------------------------------*/
 /* WiFi Parameters                       */
@@ -60,8 +63,8 @@
 #define DEFAULT_NETWRK 	192,168,4,1
 #define DEFAULT_DNS   	192,168,4,1
 #else
-#define DEFAULT_NETWRK 	192,168,0,1
-#define DEFAULT_DNS   	192,168,0,1
+#define DEFAULT_NETWRK 	192,168,4,1
+#define DEFAULT_DNS   	192,168,4,1
 #endif
 
 #endif /* ESPRESSIF32 */

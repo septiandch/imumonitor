@@ -1,9 +1,20 @@
 #include <Wire.h>
 #include "prototypes.h"
-#include "MPU9250.h"
+#ifdef ESP32_DEF
+#	include "MPU9250_.h"
+#else
+#	include "MPU9250.h"
+#endif
 
+
+#ifdef ESP32_DEF
+#define TOTAL_SAMPLE	150
+
+MPU9250 mpu;
+#else
 MPU6500 mpu;
 QMC5883L compass;
+#endif
 
 // Variables for Calibration
 bool changed = false;
@@ -35,16 +46,23 @@ void sensor_init()
 	//mpu.calibrateAccelGyro();
 	//mpu.calibrateMag();
 
+#ifndef ESP32_DEF
 	mpu.setupMag();
+#endif
 }
 
 bool sensor_checkConnection()
 {
+#ifdef ESP32_DEF
+	return true;
+#else
 	return mpu.isConnectedAccelGyro();
+#endif
 }
 
 void sensor_calibCompass()
 {
+#ifndef ESP32_DEF
 	int x, y, z;
 	
 	// Read compass values
@@ -119,6 +137,7 @@ void sensor_calibCompass()
 		Serial.println(");");
 #	endif
 	}
+#endif
 }
 
 void sensor_calibGyro() 
