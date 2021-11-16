@@ -65,7 +65,7 @@ eNODESTATE	wifi_getStatus();
 void	webserver_init();
 void	webserver_checkClientRequest();
 void	webserver_commandCheck(String cmd);
-String  webserver_prePostRequest(String sNodeId);
+String  webserver_prePostRequest(WiFiClient &client, String sNodeId);
 String	webserver_getRequest(String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt, String others);
 
 

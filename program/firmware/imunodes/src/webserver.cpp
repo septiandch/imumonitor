@@ -256,7 +256,7 @@ void  webserver_checkClientRequest()
 	}
 }
 
-String webserver_prePostRequest(String sNodeId)
+String webserver_prePostRequest(WiFiClient &client, String sNodeId)
 {
 	String payload;
 	int httpCode;
@@ -265,7 +265,7 @@ String webserver_prePostRequest(String sNodeId)
 	String message = "connect?nod="	+ sNodeId;
 
 	HTTPClient http;
-	http.begin(server + message);
+	http.begin(client, server + message);
 	http.addHeader("Content-Type", "text/plain");
 
 	// Send HTTP GET request
@@ -284,7 +284,7 @@ String webserver_prePostRequest(String sNodeId)
 	return payload;
 }
 
-String webserver_getRequest(String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt, String others)
+String webserver_getRequest(WiFiClient &client, String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt, String others)
 {
 	String payload;
 	int httpCode;
@@ -304,7 +304,7 @@ String webserver_getRequest(String sNodeId, int nRoll, int nPitch, int nYaw, lon
 	}
 
 	HTTPClient http;
-	http.begin(server + message);
+	http.begin(client, server + message);
 	http.addHeader("Content-Type", "text/plain");
 
 	// Send HTTP GET request

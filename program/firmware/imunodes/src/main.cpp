@@ -360,6 +360,15 @@ void jsonDocPrint(WiFiClient &client)
 
 	jsonPrintItem(client, "id", String(NODEID).toInt());
 	jsonPrintItem(client, "batt", bBatt);
+	
+	if(sensor_checkConnection())
+	{
+		jsonPrintItem(client, "MPU", 1);
+	}
+	else
+	{
+		jsonPrintItem(client, "MPU", 0);
+	}
 
 	jsonPrintArrayCustom(client, "roll", nRollData, nDataCount, MAX_DATA);
 	jsonPrintArrayCustom(client, "pitch", nPitchData, nDataCount, MAX_DATA);

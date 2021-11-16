@@ -1,15 +1,13 @@
 #include <Wire.h>
 #include "prototypes.h"
-#ifdef ALARM_SUPPORT
+#ifdef USE_MPU9250
 #	include "MPU9250.h"
 #else
 #	include "MPU9250_mod.h"
 #endif
 
 
-#ifdef ALARM_SUPPORT
-#define TOTAL_SAMPLE	10
-
+#ifdef USE_MPU9250
 MPU9250 mpu;
 #else
 MPU6500 mpu;
@@ -46,15 +44,15 @@ void sensor_init()
 	//mpu.calibrateAccelGyro();
 	//mpu.calibrateMag();
 
-#ifndef ALARM_SUPPORT
+#ifndef USE_MPU9250
 	mpu.setupMag();
 #endif
 }
 
 bool sensor_checkConnection()
 {
-#ifdef ALARM_SUPPORT
-	return true;
+#ifdef USE_MPU9250
+	return mpu.isConnected();
 #else
 	return mpu.isConnectedAccelGyro();
 #endif
@@ -62,7 +60,7 @@ bool sensor_checkConnection()
 
 void sensor_calibCompass()
 {
-#ifndef ALARM_SUPPORT
+#ifndef USE_MPU9250
 	int x, y, z;
 	
 	// Read compass values
