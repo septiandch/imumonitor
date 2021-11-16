@@ -1,10 +1,6 @@
 #include <Arduino.h>
-#ifdef ESP32_DEF
-#	include <WiFi.h>
-#else
-#	include <ESP8266WiFi.h>
-#	include "EasyOta.h"
-#endif
+#include <ESP8266WiFi.h>
+#include "EasyOta.h"
 #include "definitions.h"
 #include "prototypes.h"
 
@@ -19,9 +15,7 @@ void wifi_init()
 
 	webserver_init();
 
-#ifndef ESP32_DEF
 	EasyOta.setup();
-#endif
 }
 
 void wifi_connect()

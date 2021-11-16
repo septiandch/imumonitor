@@ -1,14 +1,14 @@
 #include <Wire.h>
 #include "prototypes.h"
-#ifdef ESP32_DEF
-#	include "MPU9250_.h"
-#else
+#ifdef ALARM_SUPPORT
 #	include "MPU9250.h"
+#else
+#	include "MPU9250_mod.h"
 #endif
 
 
-#ifdef ESP32_DEF
-#define TOTAL_SAMPLE	150
+#ifdef ALARM_SUPPORT
+#define TOTAL_SAMPLE	10
 
 MPU9250 mpu;
 #else
@@ -46,14 +46,14 @@ void sensor_init()
 	//mpu.calibrateAccelGyro();
 	//mpu.calibrateMag();
 
-#ifndef ESP32_DEF
+#ifndef ALARM_SUPPORT
 	mpu.setupMag();
 #endif
 }
 
 bool sensor_checkConnection()
 {
-#ifdef ESP32_DEF
+#ifdef ALARM_SUPPORT
 	return true;
 #else
 	return mpu.isConnectedAccelGyro();
@@ -62,7 +62,7 @@ bool sensor_checkConnection()
 
 void sensor_calibCompass()
 {
-#ifndef ESP32_DEF
+#ifndef ALARM_SUPPORT
 	int x, y, z;
 	
 	// Read compass values

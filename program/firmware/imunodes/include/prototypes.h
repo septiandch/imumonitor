@@ -2,11 +2,7 @@
 #define PROTOTYPES_H
 
 #include <Arduino.h>
-#ifdef ESP32_DEF
-#	include <WiFi.h>
-#else
-#   include <ESP8266HTTPClient.h>
-#endif
+#include <ESP8266HTTPClient.h>
 #include "constants.h"
 
 /*---------------------------------------*/
@@ -71,6 +67,17 @@ void	webserver_checkClientRequest();
 void	webserver_commandCheck(String cmd);
 String  webserver_prePostRequest(String sNodeId);
 String	webserver_getRequest(String sNodeId, int nRoll, int nPitch, int nYaw, long dwRollMov, long dwPitchMov, byte bBatt, String others);
+
+
+/*---------------------------------------*/
+/* JSON                                  */
+/*---------------------------------------*/
+
+void jsonPrintStart(WiFiClient &s);
+void jsonPrintEnd(WiFiClient &s);
+void jsonPrintItem(WiFiClient &s, String name, int value);
+void jsonPrintArray(WiFiClient &s, String name, int* ptr, int size);
+void jsonPrintArrayCustom(WiFiClient &s, String name, int* ptr, int start, int size);
 
 
 #endif  /* PROTOTYPES_H */

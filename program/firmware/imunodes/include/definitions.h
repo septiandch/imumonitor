@@ -1,8 +1,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#ifndef ESPRESSIF32
-
 /*---------------------------------------*/
 /* Define Options                        */
 /*---------------------------------------*/
@@ -49,8 +47,8 @@
 #define BAT_CH		    A0		//ADC
 
 /* ESP32 */
-#define PIN_BUZZER		12
-#define PIN_VIBRATOR	13
+#define PIN_BUZZER		D3
+#define PIN_VIBRATOR	D4
 
 /*---------------------------------------*/
 /* WiFi Parameters                       */
@@ -66,7 +64,5 @@
 #define DEFAULT_NETWRK 	192,168,4,1
 #define DEFAULT_DNS   	192,168,4,1
 #endif
-
-#endif /* ESPRESSIF32 */
 
 #endif  /* DEFINITIONS_H */

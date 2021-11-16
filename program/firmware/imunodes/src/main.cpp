@@ -17,7 +17,7 @@ bool bInitFlag = true;
 bool bRetryFlag = true;
 byte bRetryCount = 0;
 
-#ifdef ESP32_DEF
+#ifdef ALARM_SUPPORT
 byte bAlertCount = 0;
 bool bAlertState = 0;
 unsigned long ulAlertTimer = millis();
@@ -38,7 +38,7 @@ long dwRollMov 	= 0;
 long dwPitchMov	= 0;
 
 // Rotation Value Data Array
-const int MAX_DATA = 500;
+const int MAX_DATA = 700;
 int nDataMax = MAX_DATA;
 int nDataCount = 0;
 int nPitchData[MAX_DATA];
@@ -48,17 +48,10 @@ String strDataArray;
 const unsigned long SAMPLING_TIME = 5000;
 unsigned long dwSamplingTimer;
 
-// JSON Document
-StaticJsonDocument<30000> jsondoc;
-StaticJsonDocument<200> notreadydoc;
-bool bJsonDataReady = false;
-
 void setup()
 {
 	String nodeid = NODEID;
 	long startupdelay = 1000;
-	
-	notreadydoc["status"] = "Not Ready";
 
 	gpio_pinInit();
 	
@@ -73,21 +66,21 @@ void setup()
 void loop()
 {
 	eNodeState = wifi_getStatus();
-	wifi_checkUpdateRequest();
-	webserver_checkClientRequest();
 
 	if(eNodeState == eNODE_CONNECTED)
 	{
+		wifi_checkUpdateRequest();
+		webserver_checkClientRequest();
+		
+#if 0
 		if(!bDataSent && bTickFlag)
 		{
-#if 0
 			if(bInitFlag)
 			{
 				commandCheck(webserver_prePostRequest(NODEID));
 				bInitFlag = false;
 			}
 			else
-#endif
 			{	
 				commandCheck(webserver_getRequest(NODEID, nRoll, nPitch, nYaw, dwRollMov, dwPitchMov, bBatt, strDataArray));
 			}
@@ -99,6 +92,7 @@ void loop()
 				bDataSent = true;
 			}
 		}
+#endif
 
 		bConnRetry = 0;
 	}
@@ -118,7 +112,7 @@ void loop()
 		}
 	}	
 
-#ifdef ESP32_DEF
+#ifdef ALARM_SUPPORT
 	if((bAlertCount > 0) && (millis() - ulAlertTimer > 1000))
 	{
 		ulAlertTimer = millis();
@@ -265,6 +259,7 @@ void dataArrayAppend(int roll, int pitch, int yaw)
 	nYawData[nDataCount] = yaw;
 
 	nDataCount++;
+
 	if(nDataCount >= MAX_DATA)
 	{
 		jsonDocCreate();
@@ -303,6 +298,7 @@ void substract(long *dwVal, int substractor)
 
 void jsonDocCreate()
 {
+#if 0
 	int i;
 
 	jsondoc.clear();
@@ -340,16 +336,15 @@ void jsonDocCreate()
 		datay.add(nYawData[i]);
 	}
 
-	jsondoc["rmov"] = (dwRollMov);
-	jsondoc["pmov"] = (dwPitchMov);
+	jsondoc["end"] = "end";
 
 	bJsonDataReady = true;
+#endif
 }
-
-
 
 void jsonDocPrint(WiFiClient &client)
 {
+#if 0
 	if(bJsonDataReady)
 	{
 		serializeJsonPretty(jsondoc, client);
@@ -360,4 +355,19 @@ void jsonDocPrint(WiFiClient &client)
 	{
 		serializeJsonPretty(notreadydoc, client);
 	}
+#else
+	jsonPrintStart(client);
+
+	jsonPrintItem(client, "id", String(NODEID).toInt());
+	jsonPrintItem(client, "batt", bBatt);
+
+	jsonPrintArrayCustom(client, "roll", nRollData, nDataCount, MAX_DATA);
+	jsonPrintArrayCustom(client, "pitch", nPitchData, nDataCount, MAX_DATA);
+	jsonPrintArrayCustom(client, "yaw", nYawData, nDataCount, MAX_DATA);
+	
+	jsonPrintEnd(client);
+
+	/* Restart the count after upload it */
+	nDataCount = 0;
+#endif
 }

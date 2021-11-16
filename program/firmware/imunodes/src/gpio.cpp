@@ -12,20 +12,19 @@ eNODESTATE eLedMode = eNODE_DISCONNECTED;
 
 void gpio_pinInit()
 {
-#ifdef ESP32_DEF
-	pinMode(LED_BUILTIN, OUTPUT);
+#ifdef ALARM_SUPPORT
 	pinMode(PIN_BUZZER, OUTPUT);
 	pinMode(PIN_VIBRATOR, OUTPUT);
 
 	digitalWrite(PIN_BUZZER, LOW);
 	digitalWrite(PIN_VIBRATOR, LOW);
-#else
+#endif
+
 	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(BAT_EN, OUTPUT);
 
 	digitalWrite(LED_BUILTIN, LOW);
 	digitalWrite(BAT_EN, LOW);
-#endif
 
 	gpio_i2cInit();
 }
@@ -34,7 +33,7 @@ int gpio_battCheck()
 {
 	int value = 0;
 
-#ifdef ESP32_DEF
+#ifdef ALARM_SUPPORT
 	// ...do nothing
 #else
 	digitalWrite(BAT_EN, HIGH);

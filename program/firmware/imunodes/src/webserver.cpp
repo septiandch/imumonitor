@@ -1,11 +1,6 @@
 #include <Arduino.h>
-#ifdef ESP32_DEF
-#	include <WiFi.h>
-#	include <HTTPClient.h>
-#else
-#	include <ESP8266WiFi.h>
-#	include <ESP8266HTTPClient.h>
-#endif
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include "prototypes.h"
 #include "definitions.h"
 #include "variables.h"
@@ -104,7 +99,11 @@ void  webserver_checkClientRequest()
 		currentTime = millis();
 		previousTime = currentTime;
 
+	#	ifdef ESP32_DEF
+		digitalWrite(LED_BUILTIN, HIGH);
+	#	else
 		digitalWrite(LED_BUILTIN, LOW);
+	#	endif
 		
 		while (client.connected() && currentTime - previousTime <= timeoutTime)
 		{
@@ -134,7 +133,7 @@ void  webserver_checkClientRequest()
 						{
 							//...do nothing
 						}
-					#ifdef ESP32_DEF
+					#ifdef ALARM_SUPPORT
 						else if (header.indexOf("alert1") >= 0) 
 						{
 							bAlertCount = 0;
@@ -207,11 +206,11 @@ void  webserver_checkClientRequest()
 							client.println("<p>Pitch Diff : "	+ String(dwPitchMov, DEC)	+ "</p>");
 							
 							client.println("</body></html>");
+						
+							// The HTTP response ends with another blank line
+							client.println();
 					#	endif
 						}
-						
-						// The HTTP response ends with another blank line
-						client.println();
 						
 						/*
 						if (header.indexOf("GET /calibrate") >= 0)
@@ -248,7 +247,12 @@ void  webserver_checkClientRequest()
 		// Close the connection
 		client.stop();
 
+
+	#	ifdef ESP32_DEF
+		digitalWrite(LED_BUILTIN, LOW);
+	#	else
 		digitalWrite(LED_BUILTIN, HIGH);
+	#	endif
 	}
 }
 

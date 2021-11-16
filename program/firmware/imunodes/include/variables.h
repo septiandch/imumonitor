@@ -19,7 +19,7 @@ extern int nYawData[];
 extern long dwRollMov; 
 extern long dwPitchMov;
 
-#ifdef ESP32_DEF
+#ifdef ALARM_SUPPORT
 extern byte bAlertCount;
 extern bool bAlertState;
 extern unsigned long ulAlertTimer;
