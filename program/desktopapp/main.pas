@@ -235,7 +235,8 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  INI: TINIFile;
+  INI: TINIFile; 
+  today : TDateTime;
 begin
   INI := TINIFile.Create('conf.ini');
   try
@@ -278,6 +279,11 @@ begin
   Setlength(nValueRoll, 8, MAX_DATA);
   Setlength(nValuePitch, 8, MAX_DATA);
   Setlength(nValueYaw, 8, MAX_DATA);
+
+  today := Now;
+  Label_date.Caption := FormatDateTime('dd', today) + '-' +
+                        FormatDateTime('MM', today) + '-' +
+                        FormatDateTime('yyyy', today);
 
   InitializeLineSeries;
 end;

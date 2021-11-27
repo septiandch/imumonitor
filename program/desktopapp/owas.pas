@@ -477,25 +477,25 @@ begin
     bRetVal := 1;
   end
 
-  { Standing with one leg bent }
+  { --Standing or Squatting with one leg bent }
   else if((compareInRange(bRightUpperLeg, leg_bent_level, leg_sit_level)
       and compareInRange(bLeftUpperLeg, leg_sit_level, 180))
         or ((compareInRange(bRightUpperLeg, leg_sit_level, 180)
           and compareInRange(bLeftUpperLeg, leg_bent_level, leg_sit_level)))) then
   begin
     bRetVal := 5;
-  end
+  end       
 
-  { Standing with both legs bent }
-  else if((compareInRange(bRightUpperLeg, leg_bent_level, leg_sit_level)
-        and compareInRange(bLeftUpperLeg, leg_bent_level, leg_sit_level))) then
+  { --Squatting }
+  else if((compareInRange(bRightUpperLeg, leg_squat_level, 180)
+      and compareInRange(bLeftUpperLeg, leg_squat_level, 180))) then
   begin
     bRetVal := 4;
   end
 
-  { Squatting }
-  else if((compareInRange(bRightUpperLeg, leg_squat_level, 180)
-      and compareInRange(bLeftUpperLeg, leg_squat_level, 180))) then
+  { --Kneeling with one leg or both legs }
+  else if((compareInRange(bRightUpperLeg, leg_bent_level, leg_sit_level)
+        and compareInRange(bLeftUpperLeg, leg_bent_level, leg_sit_level))) then
   begin
     bRetVal := 6;
   end

@@ -145,3 +145,7 @@ program/desktopapp/imumonitor
 program/desktopapp/backup/
 
 program/desktopapp/lib/x86_64-linux/
+
+*.exe
+
+*.obj
