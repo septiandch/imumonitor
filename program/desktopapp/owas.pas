@@ -45,6 +45,9 @@ const
   LEG_LEFT_RMOVE : integer = 2;
   LEG_LEFT_PMOVE : integer = 3;
 
+  DIR_FRONT : integer = 1;
+  DIR_BACK : integer = -1;
+
   PREVMOVE : integer = 0;
   CALCMOVE : integer = 1;
 
@@ -57,7 +60,7 @@ var
   shoulder_level : integer;
   load1_level, load2_level: integer;
   back_bent_level, back_twist_level : integer;
-  leg_stand_level, leg_bent_level, leg_sit_level, leg_squat_level : integer;
+  leg_stand_level, leg_bent_level, leg_sit_level, leg_squat_level, leg_max_level : integer;
   movesense_level : integer;
   sensor_value: array[1..8, 0..2] of integer;
   sensor_value_ave: array[1..8, 0..2] of integer;
@@ -95,16 +98,17 @@ function OwasCalcAve(load : integer): string;
 function OwasBack(bBackRoll:integer; bBackPitch:integer; bBackYaw:integer;
                   bBack2Roll:integer; bBack2Pitch:integer; bBack2Yaw:integer): integer;
 function OwasArms(bRightArmRoll:integer; bRightArmPitch:integer; bLeftArmRoll:integer; bLeftArmPitch:integer): integer;
-function OwasLegs(bRightUpperLeg:integer;
-                  bRightLowerLeg:integer;
-                  bLeftUpperLeg:integer;
-                  bLeftLowerLeg:integer;
+function OwasLegs(bRightUpperLegRaw:integer;
+                  bRightLowerLegRaw:integer;
+                  bLeftUpperLegRaw:integer;
+                  bLeftLowerLegRaw:integer;
                   bRightMoveR:integer;
                   bRightMoveP:integer;
                   bLeftMoveR:integer;
                   bLeftMoveP:integer): integer;
 function OwasLoad(nUserLoad:integer): integer;
 function CompareInRange(range : integer; limit1 : integer; limit2 : integer) : boolean;
+function GetLegVal(degree : integer) : integer;
 
 implementation
 
@@ -130,6 +134,7 @@ begin
   leg_bent_level    := leg_bent_set    ;
   leg_sit_level     := leg_sit_set     ;
   leg_squat_level   := leg_squat_set   ;
+  leg_max_level     := 181             ;
   load1_level       := load1_set       ;
   load2_level       := load2_set       ;
   movesense_level   := movesense_set   ;
@@ -425,89 +430,139 @@ begin
   movesense_sample[LEG_LEFT_pMOVE][PREVMOVE]  := leg_left_p;
 end;
 
-function OwasLegs(bRightUpperLeg:integer;
-                         bRightLowerLeg:integer;
-                         bLeftUpperLeg:integer;
-                         bLeftLowerLeg:integer;
-                         bRightMoveR:integer;
-                         bRightMoveP:integer;
-                         bLeftMoveR:integer;
-                         bLeftMoveP:integer): integer;
+function OwasLegs(bRightUpperLegRaw:integer;
+                  bRightLowerLegRaw:integer;
+                  bLeftUpperLegRaw:integer;
+                  bLeftLowerLegRaw:integer;
+                  bRightMoveR:integer;
+                  bRightMoveP:integer;
+                  bLeftMoveR:integer;
+                  bLeftMoveP:integer): integer;
 var
-  bretval : integer;
+  bretval          : integer;
+  bRightUpperLeg   : integer;
+  bRightLowerLeg   : integer;
+  bLeftUpperLeg    : integer;
+  bLeftLowerLeg    : integer;
+  right_upper_val  : integer;
+  right_lower_val  : integer;
+  left_upper_val   : integer;
+  left_lower_val   : integer;
+  right_upper_dir  : integer;
+  left_upper_dir   : integer;
+  right_lower_dir  : integer;
+  left_lower_dir   : integer;
+  stand_val        : integer = 1;
+  bent_val         : integer = 2;
+  sit_val          : integer = 3;
+  squat_val        : integer = 4;
 begin
   bRetVal := 1;
 
-  bRightUpperLeg   := abs(bRightUpperLeg);
-  bRightLowerLeg   := abs(bRightLowerLeg);
-  bLeftUpperLeg    := abs(bLeftUpperLeg );
-  bLeftLowerLeg    := abs(bLeftLowerLeg );
-  bRightMoveR      := abs(bRightMoveR   );
-  bRightMoveP      := abs(bRightMoveP   );
-  bLeftMoveR       := abs(bLeftMoveR    );
-  bLeftMoveP       := abs(bLeftMoveP    );
+  bRightUpperLeg   := abs(bRightUpperLegRaw );
+  bRightLowerLeg   := abs(bRightLowerLegRaw );
+  bLeftUpperLeg    := abs(bLeftUpperLegRaw  );
+  bLeftLowerLeg    := abs(bLeftLowerLegRaw  );
+  bRightMoveR      := abs(bRightMoveR       );
+  bRightMoveP      := abs(bRightMoveP       );
+  bLeftMoveR       := abs(bLeftMoveR        );
+  bLeftMoveP       := abs(bLeftMoveP        );
 
-  { Moving or Walking }
+  right_upper_dir  := DIR_FRONT;
+  left_upper_dir   := DIR_FRONT;
+  right_lower_dir  := DIR_FRONT;
+  left_lower_dir   := DIR_FRONT;
+
+  bRetVal := 0;
+
+  if bRightUpperLegRaw < 0 then right_upper_dir := DIR_BACK; 
+  if bRightLowerLegRaw < 0 then right_lower_dir := DIR_BACK;
+  if bLeftUpperLegRaw < 0 then left_upper_dir := DIR_BACK;
+  if bLeftLowerLegRaw < 0 then left_lower_dir := DIR_BACK;
+
+  right_upper_val := GetLegVal(bRightUpperLeg);
+  right_lower_val := GetLegVal(bRightLowerLeg);
+  left_upper_val := GetLegVal(bLeftUpperLeg);
+  left_lower_val := GetLegVal(bLeftLowerLeg);
+
+  {
+  TForm1.Label6.caption := int2str(right_upper_val);
+  TForm1.Label7.caption := int2str(right_lower_val);
+  TForm1.Label8.caption := int2str(left_upper_val);
+  TForm1.Label9.caption := int2str(left_lower_val);
+  }
+
+  { Moving }
   if ((bRightMoveR > movesense_level) or (bRightMoveP > movesense_level))
-    and ((bLeftMoveR > movesense_level) or (bLeftMoveP > movesense_level)) then
-  begin
-    bRetVal := 7;
-  end
+    and ((bLeftMoveR > movesense_level) or (bLeftMoveP > movesense_level))
 
-  { Standing with one leg }
-  else if ((compareInRange(bRightUpperLeg, leg_stand_level, leg_bent_level)
-        and compareInRange(bLeftUpperLeg, leg_bent_level, 180))
-          or ((compareInRange(bRightUpperLeg, leg_bent_level, 180)
-            and compareInRange(bLeftUpperLeg, leg_stand_level, leg_bent_level)))) then
-  begin
-    bRetVal := 3;
-  end
-
-  { Stand }
-  else if(compareInRange(bRightUpperLeg, leg_stand_level, leg_bent_level)
-      and compareInRange(bLeftUpperLeg, leg_stand_level, leg_bent_level)) then
-  begin
-    bRetVal := 2;
-  end      
+    then bRetVal := 7
 
   { Sit }
-  else if((compareInRange(bRightUpperLeg, leg_sit_level, leg_squat_level)
-      and compareInRange(bLeftUpperLeg, leg_sit_level, leg_squat_level))) then
-  begin
-    bRetVal := 1;
-  end
+  else if ((right_upper_val = sit_val) and (left_upper_val = sit_val))
+      and (((right_lower_val < sit_val) and (left_lower_val < sit_val))
+          or ((right_lower_dir = DIR_FRONT) and (left_lower_dir = DIR_FRONT)))
 
-  { --Standing or Squatting with one leg bent }
-  else if((compareInRange(bRightUpperLeg, leg_bent_level, leg_sit_level)
-      and compareInRange(bLeftUpperLeg, leg_sit_level, 180))
-        or ((compareInRange(bRightUpperLeg, leg_sit_level, 180)
-          and compareInRange(bLeftUpperLeg, leg_bent_level, leg_sit_level)))) then
-  begin
-    bRetVal := 5;
-  end       
+     then bretval := 1       
 
-  { --Squatting }
-  else if((compareInRange(bRightUpperLeg, leg_squat_level, 180)
-      and compareInRange(bLeftUpperLeg, leg_squat_level, 180))) then
-  begin
-    bRetVal := 4;
-  end
+  { Standing }
+  else if ((right_upper_val = stand_val) and (left_upper_val = stand_val))
+      and ((right_lower_val = stand_val) and (left_lower_val = stand_val))
 
-  { --Kneeling with one leg or both legs }
-  else if((compareInRange(bRightUpperLeg, leg_bent_level, leg_sit_level)
-        and compareInRange(bLeftUpperLeg, leg_bent_level, leg_sit_level))) then
-  begin
-    bRetVal := 6;
-  end
+     then bretval := 2
 
-  { Default: Sitting }
-  else
-  begin
-    bRetVal := 1;
-  end;
+  { Stand with 1 leg }
+  else if  ((right_upper_val = stand_val) and (right_lower_val = stand_val))
+       xor ((left_upper_val = stand_val) and (left_lower_val = stand_val))
+
+       then bretval := 3
+
+  { Squat or Stand with both legs bent }
+  else if (((right_upper_val > stand_val) and (left_upper_val > stand_val))
+          and ((right_upper_val <= squat_val) and (left_upper_val <= squat_val)))
+
+     then begin
+       if ((right_lower_val < sit_val) and (left_lower_val < sit_val))
+            then bretval := 4
+
+       { Sit }
+       else if((right_lower_val >= sit_val) and (left_lower_val >= sit_val))
+            then bretval := 1
+
+       { 1 leg squat }
+       else
+           bretval := 5;
+
+     end
+
+  { standing with 1 bent leg }
+  else if ((right_lower_val < sit_val) or (left_lower_val < sit_val))
+
+       then bretval := 5
+
+  { Kneeling }   
+  else if ((right_lower_val >= sit_val) and (left_lower_val >= sit_val))
+      and ((right_lower_dir = DIR_BACK) and (left_lower_dir = DIR_BACK))
+
+     then bretval := 6;
+
 
   result := bRetVal;
 
+end;
+
+function GetLegVal(degree : integer) : integer;
+begin
+  if CompareInRange(degree, leg_stand_level, leg_bent_level) then
+    result := 1
+  else if CompareInRange(degree, leg_bent_level, leg_sit_level) then
+    result := 2
+  else if CompareInRange(degree, leg_sit_level, leg_squat_level) then
+    result := 3
+  else if CompareInRange(degree, leg_squat_level, leg_max_level) then
+    result := 4
+  else
+    result := 0;
 end;
 
 function OwasLoad(nUserLoad:integer): integer;

@@ -149,3 +149,5 @@ program/desktopapp/lib/x86_64-linux/
 *.exe
 
 *.obj
+
+*.bak

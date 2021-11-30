@@ -36,6 +36,12 @@ type
     GroupBox1: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
 
     Label_Legend_Owas: TLabel;
     Label_AlarmCheck: TLabel;
@@ -156,6 +162,15 @@ type
     procedure FileNameEditAcceptFileName(Sender: TObject; var Value: String);
 
     procedure LoadCsv;
+    procedure OwasCheckSim;
+    procedure TrackBar1Change(Sender: TObject);
+    procedure TrackBar2Change(Sender: TObject);
+    procedure TrackBar3Change(Sender: TObject);
+    procedure TrackBar4Change(Sender: TObject);
+    procedure TrackBar5Change(Sender: TObject);
+    procedure TrackBar6Change(Sender: TObject);
+    procedure TrackBar7Change(Sender: TObject);
+    procedure TrackBar8Change(Sender: TObject);
     procedure TrackBar_BackBentChange(Sender: TObject);
     procedure TrackBar_BackTwistChange(Sender: TObject);
     procedure TrackBar_LegBentChange(Sender: TObject);
@@ -268,7 +283,7 @@ begin
   TrackBar_AlarmCheckChange(nil);
 
   PageControl1.ActivePage := TabSheet1;
-  TabSheet5.TabVisible := false;
+  TabSheet5.TabVisible := true;
 
   sDataList := TStringList.Create;
 
@@ -286,6 +301,7 @@ begin
                         FormatDateTime('yyyy', today);
 
   InitializeLineSeries;
+  InitializeLevelSettings;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -980,6 +996,76 @@ procedure TForm1.Button9Click(Sender: TObject);
 begin
   CsvFileName := '21-06-2021_Andri.csv';
   UpdateEndTimeCsv('06:20');
+end;
+
+procedure TForm1.TrackBar1Change(Sender: TObject);
+begin
+  Label1.Caption := inttostr(TrackBar1.Position);  
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar2Change(Sender: TObject);
+begin
+  Label2.Caption := inttostr(TrackBar2.Position);  
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar3Change(Sender: TObject);
+begin
+  Label4.Caption := inttostr(TrackBar3.Position); 
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar4Change(Sender: TObject);
+begin
+  Label5.Caption := inttostr(TrackBar4.Position); 
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar5Change(Sender: TObject);
+begin
+  Label6.Caption := inttostr(TrackBar5.Position);   
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar6Change(Sender: TObject);
+begin
+  Label7.Caption := inttostr(TrackBar6.Position);   
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar7Change(Sender: TObject);
+begin
+  Label8.Caption := inttostr(TrackBar7.Position);  
+  OwasCheckSim;
+end;
+
+procedure TForm1.TrackBar8Change(Sender: TObject);
+begin
+  Label9.Caption := inttostr(TrackBar8.Position);
+  OwasCheckSim;
+end;
+
+procedure TForm1.OwasCheckSim;
+var
+  result : integer;
+begin
+   result :=
+       OwasLegs(TrackBar1.Position, TrackBar2.Position,
+                TrackBar3.Position, TrackBar4.Position,
+                0, 0,
+                0, 0);
+
+   Label30.caption := inttostr(result);
+
+   if(result = 1) then Label30.caption := Label30.caption + ' : sit'
+   else if(result = 2) then Label30.caption := Label30.caption + ' : stand'
+   else if(result = 3) then Label30.caption := Label30.caption + ' : 1 leg stand'
+   else if(result = 4) then Label30.caption := Label30.caption + ' : stand or squat with legs bent'
+   else if(result = 5) then Label30.caption := Label30.caption + ' : stand or squat with 1 leg bent'
+   else if(result = 6) then Label30.caption := Label30.caption + ' : kneeling'
+   else if(result = 7) then Label30.caption := Label30.caption + ' : moving'
+   else Label30.caption := Label30.caption + ' : Not set';
 end;
 
 procedure TForm1.Edit_BeratKeyPress(Sender: TObject; var Key: char);
