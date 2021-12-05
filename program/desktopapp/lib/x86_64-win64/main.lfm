@@ -1,11 +1,11 @@
 object Form1: TForm1
-  Left = 635
-  Height = 726
-  Top = 4
-  Width = 1191
+  Left = 255
+  Height = 579
+  Top = 108
+  Width = 983
   Caption = 'OWAS Level Monitoring'
-  ClientHeight = 726
-  ClientWidth = 1191
+  ClientHeight = 579
+  ClientWidth = 983
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
@@ -60,81 +60,81 @@ object Form1: TForm1
   end
   object PageControl1: TPageControl
     Left = 200
-    Height = 633
+    Height = 486
     Top = 80
-    Width = 975
-    ActivePage = TabSheet5
+    Width = 767
+    ActivePage = TabSheet4
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 4
+    TabIndex = 3
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'OWAS Level'
-      ClientHeight = 605
-      ClientWidth = 967
+      ClientHeight = 458
+      ClientWidth = 759
       object Label_Legend_Legs: TLabel
-        Left = 849
+        Left = 641
         Height = 15
-        Top = 573
+        Top = 426
         Width = 24
         Anchors = [akRight, akBottom]
         Caption = 'Legs'
         ParentColor = False
       end
       object Label_Legend_Load: TLabel
-        Left = 929
+        Left = 721
         Height = 15
-        Top = 573
+        Top = 426
         Width = 26
         Anchors = [akRight, akBottom]
         Caption = 'Load'
         ParentColor = False
       end
       object Label_Legend_Arms: TLabel
-        Left = 770
+        Left = 562
         Height = 15
-        Top = 573
+        Top = 426
         Width = 28
         Anchors = [akRight, akBottom]
         Caption = 'Arms'
         ParentColor = False
       end
       object Label_Legend_Back: TLabel
-        Left = 697
+        Left = 489
         Height = 15
-        Top = 573
+        Top = 426
         Width = 25
         Anchors = [akRight, akBottom]
         Caption = 'Back'
         ParentColor = False
       end
       object Shape1: TShape
-        Left = 666
+        Left = 458
         Height = 16
-        Top = 573
+        Top = 426
         Width = 17
         Anchors = [akRight, akBottom]
         Brush.Color = clBlue
       end
       object Shape2: TShape
-        Left = 738
+        Left = 530
         Height = 16
-        Top = 573
+        Top = 426
         Width = 17
         Anchors = [akRight, akBottom]
         Brush.Color = clYellow
       end
       object Shape3: TShape
-        Left = 818
+        Left = 610
         Height = 16
-        Top = 573
+        Top = 426
         Width = 17
         Anchors = [akRight, akBottom]
         Brush.Color = clRed
       end
       object Shape4: TShape
-        Left = 898
+        Left = 690
         Height = 16
-        Top = 573
+        Top = 426
         Width = 17
         Anchors = [akRight, akBottom]
         Brush.Color = clLime
@@ -167,9 +167,9 @@ object Form1: TForm1
       end
       object Chart_Owas: TChart
         Left = 16
-        Height = 309
+        Height = 162
         Top = 248
-        Width = 939
+        Width = 731
         AxisList = <        
           item
             Intervals.NiceSteps = '1.0'
@@ -231,18 +231,18 @@ object Form1: TForm1
         end
       end
       object Label_Legend_Owas: TLabel
-        Left = 619
+        Left = 411
         Height = 15
-        Top = 574
+        Top = 427
         Width = 34
         Anchors = [akRight, akBottom]
         Caption = 'OWAS'
         ParentColor = False
       end
       object Shape8: TShape
-        Left = 587
+        Left = 379
         Height = 16
-        Top = 574
+        Top = 427
         Width = 17
         Anchors = [akRight, akBottom]
         Brush.Color = clBlack
@@ -576,8 +576,8 @@ object Form1: TForm1
     end
     object TabSheet3: TTabSheet
       Caption = 'Setting'
-      ClientHeight = 605
-      ClientWidth = 967
+      ClientHeight = 458
+      ClientWidth = 759
       object Label_Lv_BackBent: TLabel
         AnchorSideTop.Side = asrCenter
         AnchorSideBottom.Side = asrCenter
@@ -735,9 +735,9 @@ object Form1: TForm1
         Top = 232
         Width = 184
         Max = 100
-        Min = 70
+        Min = 60
         OnChange = TrackBar_LegSitChange
-        Position = 70
+        Position = 60
         TabOrder = 5
       end
       object Label_Lv_Load2: TLabel
@@ -824,7 +824,7 @@ object Form1: TForm1
       object Button4: TButton
         Left = 664
         Height = 38
-        Top = 552
+        Top = 405
         Width = 152
         Anchors = [akLeft, akBottom]
         Caption = 'Save'
@@ -834,7 +834,7 @@ object Form1: TForm1
       object Button5: TButton
         Left = 504
         Height = 38
-        Top = 552
+        Top = 405
         Width = 152
         Anchors = [akLeft, akBottom]
         Caption = 'Reset'
@@ -898,8 +898,8 @@ object Form1: TForm1
     end
     object TabSheet4: TTabSheet
       Caption = 'User Data'
-      ClientHeight = 605
-      ClientWidth = 967
+      ClientHeight = 458
+      ClientWidth = 759
       object Edit_Nama: TEdit
         Left = 16
         Height = 23
@@ -1021,8 +1021,8 @@ object Form1: TForm1
     end
     object TabSheet5: TTabSheet
       Caption = 'Test'
-      ClientHeight = 605
-      ClientWidth = 967
+      ClientHeight = 458
+      ClientWidth = 759
       TabVisible = False
       object Button1: TButton
         Left = 24
@@ -1260,10 +1260,12 @@ object Form1: TForm1
   object Button_Start: TButton
     Left = 16
     Height = 40
-    Top = 136
-    Width = 160
+    Top = 137
+    Width = 128
     Caption = 'Start Monitoring'
+    Color = clRed
     OnClick = Button_StartClick
+    ParentFont = False
     TabOrder = 1
   end
   object FileNameEdit: TFileNameEdit
@@ -1281,6 +1283,31 @@ object Form1: TForm1
     MaxLength = 0
     TabOrder = 2
     Text = 'Choose file...'
+  end
+  object Label10: TLabel
+    Left = 408
+    Height = 50
+    Top = 15
+    Width = 135
+    Caption = 'Label10'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlue
+    Font.Height = -37
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+    Visible = False
+  end
+  object Shape_StatLamp: TShape
+    Left = 152
+    Height = 41
+    Top = 136
+    Width = 40
+    Brush.Color = clDefault
+    Shape = stCircle
   end
   object Timer: TTimer
     Enabled = False

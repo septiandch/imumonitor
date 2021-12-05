@@ -459,14 +459,14 @@ var
 begin
   bRetVal := 1;
 
-  bRightUpperLeg   := abs(bRightUpperLegRaw );
-  bRightLowerLeg   := abs(bRightLowerLegRaw );
-  bLeftUpperLeg    := abs(bLeftUpperLegRaw  );
-  bLeftLowerLeg    := abs(bLeftLowerLegRaw  );
-  bRightMoveR      := abs(bRightMoveR       );
-  bRightMoveP      := abs(bRightMoveP       );
-  bLeftMoveR       := abs(bLeftMoveR        );
-  bLeftMoveP       := abs(bLeftMoveP        );
+  bRightUpperLeg   := abs(bRightUpperLegRaw     );
+  bRightLowerLeg   := abs(bRightLowerLegRaw     );
+  bLeftUpperLeg    := abs(bLeftUpperLegRaw * -1 );
+  bLeftLowerLeg    := abs(bLeftLowerLegRaw * -1 );
+  bRightMoveR      := abs(bRightMoveR           );
+  bRightMoveP      := abs(bRightMoveP           );
+  bLeftMoveR       := abs(bLeftMoveR            );
+  bLeftMoveP       := abs(bLeftMoveP            );
 
   right_upper_dir  := DIR_FRONT;
   left_upper_dir   := DIR_FRONT;
@@ -475,8 +475,8 @@ begin
 
   bRetVal := 0;
 
-  if bRightUpperLegRaw < 0 then right_upper_dir := DIR_BACK; 
-  if bRightLowerLegRaw < 0 then right_lower_dir := DIR_BACK;
+  if bRightUpperLegRaw > 0 then right_upper_dir := DIR_BACK;
+  if bRightLowerLegRaw > 0 then right_lower_dir := DIR_BACK;
   if bLeftUpperLegRaw < 0 then left_upper_dir := DIR_BACK;
   if bLeftLowerLegRaw < 0 then left_lower_dir := DIR_BACK;
 
@@ -518,8 +518,10 @@ begin
        then bretval := 3
 
   { Squat or Stand with both legs bent }
-  else if (((right_upper_val > stand_val) and (left_upper_val > stand_val))
-          and ((right_upper_val <= squat_val) and (left_upper_val <= squat_val)))
+  else if ( (right_upper_val > stand_val) and (left_upper_val > stand_val) and
+            (right_upper_val <= squat_val) and (left_upper_val <= squat_val) )
+      and (((right_lower_val < sit_val) and (left_lower_val < sit_val)) or
+           ((right_lower_dir = DIR_FRONT) and (left_lower_dir = DIR_FRONT)))
 
      then begin
        if ((right_lower_val < sit_val) and (left_lower_val < sit_val))
@@ -541,8 +543,8 @@ begin
        then bretval := 5
 
   { Kneeling }   
-  else if ((right_lower_val >= sit_val) and (left_lower_val >= sit_val))
-      and ((right_lower_dir = DIR_BACK) and (left_lower_dir = DIR_BACK))
+  else if ((right_lower_dir = DIR_BACK) and (right_lower_val >= sit_val))
+      or ((left_lower_dir = DIR_BACK) and (left_lower_val >= sit_val))
 
      then bretval := 6;
 

@@ -35,6 +35,7 @@ type
     FileNameEdit: TFileNameEdit;
     GroupBox1: TGroupBox;
     Label1: TLabel;
+    Label10: TLabel;
     Label2: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -104,6 +105,7 @@ type
     Memo2: TMemo;
     
     PageControl1: TPageControl;
+    Shape_StatLamp: TShape;
     StringGrid_SensorOverview: TStringGrid;
 
     TabSheet1: TTabSheet;
@@ -283,7 +285,7 @@ begin
   TrackBar_AlarmCheckChange(nil);
 
   PageControl1.ActivePage := TabSheet1;
-  TabSheet5.TabVisible := true;
+  TabSheet5.TabVisible := false;
 
   sDataList := TStringList.Create;
 
@@ -356,6 +358,7 @@ begin
     Button_Start.Caption := 'Start Monitoring';
     Button_Start.Font.Color := clDefault;
     Button_Start.Font.Bold := false;
+    Shape_StatLamp.Brush.Color := clScrollBar;
 
     UpdateEndTimeCsv(FormatDateTime('hh',nTime)
                      + ':' + FormatDateTime('nn',nTime));
@@ -370,7 +373,8 @@ begin
        bMonitoringState := true;
        Button_Start.Caption := 'Stop Monitoring';
        Button_Start.Font.Color := clRed;
-       Button_Start.Font.Bold := true;
+       Button_Start.Font.Bold := true;      
+       Shape_StatLamp.Brush.Color := clLime;
 
        nTime := Now;
        
@@ -525,18 +529,26 @@ begin
       berror := true;
     end else
     begin
-      Json := GetJSON(sData[devindex]);
+      try
+        Json := GetJSON(sData[devindex]);  
+      except
+        on E : Exception do
+            berror := true;
+      end;
 
-      JarrayRoll := TJSONArray(Json.FindPath('roll'));
-      JarrayPitch := TJSONArray(Json.FindPath('pitch'));
-      JarrayYaw := TJSONArray(Json.FindPath('yaw'));
-
-      for index := 0 to DATA_COUNT do
+      if not berror then
       begin
-        if(devindex = 1) then sDataList.Add(JarrayRoll.Strings[index])
-        else sDataList[index] := sDataList[index] + JarrayRoll.Strings[index];
-        sDataList[index] := sDataList[index] + ',' + JarrayPitch.Strings[index];
-        sDataList[index] := sDataList[index] + ',' + JarrayYaw.Strings[index] + ',';
+        JarrayRoll := TJSONArray(Json.FindPath('roll'));
+        JarrayPitch := TJSONArray(Json.FindPath('pitch'));
+        JarrayYaw := TJSONArray(Json.FindPath('yaw'));
+
+        for index := 0 to DATA_COUNT do
+        begin
+          if(devindex = 1) then sDataList.Add(JarrayRoll.Strings[index])
+          else sDataList[index] := sDataList[index] + JarrayRoll.Strings[index];
+          sDataList[index] := sDataList[index] + ',' + JarrayPitch.Strings[index];
+          sDataList[index] := sDataList[index] + ',' + JarrayYaw.Strings[index] + ',';
+        end;
       end;
     end;
   end;
@@ -583,16 +595,16 @@ begin
 
     closefile(csvfile);
 
-    sDataList.clear;
-
-    for devindex := 1 to DEVICE_COUNT do
-    begin
-      bReady[devindex] := false; 
-      bRetry[devindex] := 0;
-    end;
-
     chdir(currentDir);
   end;
+
+  for devindex := 1 to DEVICE_COUNT do
+  begin
+    bReady[devindex] := false;
+    bRetry[devindex] := 0;
+  end;
+
+  sDataList.clear;
 end;
 
 procedure TForm1.ComboBox_SensorChange(Sender: TObject);
@@ -769,6 +781,21 @@ begin
   Label_Owas_ArmsNum.Caption := strlist[3];
   Label_Owas_LegsNum.Caption := strlist[4];
   Label_Owas_LoadNum.Caption := strlist[5];
+
+  { ------------------------------------------------------------------- }
+
+   Label10.caption := strlist[4];
+
+   if(strlist[4] = '1') then Label10.caption := Label10.caption + ' : sit'
+   else if(strlist[4] = '2') then Label10.caption := Label10.caption + ' : stand'
+   else if(strlist[4] = '3') then Label10.caption := Label10.caption + ' : 1 leg stand'
+   else if(strlist[4] = '4') then Label10.caption := Label10.caption + ' : stand or squat with legs bent'
+   else if(strlist[4] = '5') then Label10.caption := Label10.caption + ' : stand or squat with 1 leg bent'
+   else if(strlist[4] = '6') then Label10.caption := Label10.caption + ' : kneeling'
+   else if(strlist[4] = '7') then Label10.caption := Label10.caption + ' : moving'
+   else Label10.caption := Label10.caption + ' : Not set';
+
+  { ------------------------------------------------------------------- }
 
   if (not bLoadCSV) then
   begin
@@ -1052,7 +1079,7 @@ var
 begin
    result :=
        OwasLegs(TrackBar1.Position, TrackBar2.Position,
-                TrackBar3.Position, TrackBar4.Position,
+                TrackBar3.Position * -1, TrackBar4.Position *-1,
                 0, 0,
                 0, 0);
 
